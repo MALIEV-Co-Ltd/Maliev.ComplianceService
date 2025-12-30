@@ -1,13 +1,13 @@
-using Maliev.EmployeeService.Domain.IntegrationEvents;
+using Maliev.MessagingContracts.Generated;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Maliev.ComplianceService.Infrastructure.Consumers;
 
 /// <summary>
-/// Consumes EmployeeCreatedIntegrationEvent to maintain employee context.
+/// Consumes EmployeeCreatedEvent to maintain employee context.
 /// </summary>
-public class EmployeeCreatedEventConsumer : IConsumer<EmployeeCreatedIntegrationEvent>
+public class EmployeeCreatedEventConsumer : IConsumer<EmployeeCreatedEvent>
 {
     private readonly ILogger<EmployeeCreatedEventConsumer> _logger;
 
@@ -21,9 +21,9 @@ public class EmployeeCreatedEventConsumer : IConsumer<EmployeeCreatedIntegration
     }
 
     /// <inheritdoc/>
-    public Task Consume(ConsumeContext<EmployeeCreatedIntegrationEvent> context)
+    public Task Consume(ConsumeContext<EmployeeCreatedEvent> context)
     {
-        _logger.LogInformation("Processing EmployeeCreatedIntegrationEvent for Employee: {EmployeeId}", context.Message.EmployeeId);
+        _logger.LogInformation("Processing EmployeeCreatedEvent for Employee: {EmployeeId}", context.Message.Payload.EmployeeId);
         return Task.CompletedTask;
     }
 }

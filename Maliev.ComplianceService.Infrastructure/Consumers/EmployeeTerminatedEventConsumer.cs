@@ -1,14 +1,14 @@
 using Maliev.ComplianceService.Application.Interfaces;
-using Maliev.EmployeeService.Domain.IntegrationEvents;
+using Maliev.MessagingContracts.Generated;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Maliev.ComplianceService.Infrastructure.Consumers;
 
 /// <summary>
-/// Consumes EmployeeTerminatedIntegrationEvent to deactivate work authorizations.
+/// Consumes EmployeeTerminatedEvent to deactivate work authorizations.
 /// </summary>
-public class EmployeeTerminatedEventConsumer : IConsumer<EmployeeTerminatedIntegrationEvent>
+public class EmployeeTerminatedEventConsumer : IConsumer<EmployeeTerminatedEvent>
 {
     private readonly IWorkAuthorizationRepository _repository;
     private readonly ILogger<EmployeeTerminatedEventConsumer> _logger;
@@ -27,10 +27,10 @@ public class EmployeeTerminatedEventConsumer : IConsumer<EmployeeTerminatedInteg
     }
 
     /// <inheritdoc/>
-    public async Task Consume(ConsumeContext<EmployeeTerminatedIntegrationEvent> context)
+    public async Task Consume(ConsumeContext<EmployeeTerminatedEvent> context)
     {
-        _logger.LogInformation("Processing EmployeeTerminatedIntegrationEvent for Employee: {EmployeeId}", context.Message.EmployeeId);
-        await _repository.DeactivateWorkAuthorizationsAsync(context.Message.EmployeeId);
-        _logger.LogInformation("Deactivated work authorizations for terminated employee: {EmployeeId}", context.Message.EmployeeId);
+        _logger.LogInformation("Processing EmployeeTerminatedEvent for Employee: {EmployeeId}", context.Message.Payload.EmployeeId);
+        await _repository.DeactivateWorkAuthorizationsAsync(context.Message.Payload.EmployeeId);
+        _logger.LogInformation("Deactivated work authorizations for terminated employee: {EmployeeId}", context.Message.Payload.EmployeeId);
     }
 }
