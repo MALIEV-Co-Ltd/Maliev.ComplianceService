@@ -31,16 +31,12 @@ public class ComplianceServiceTestFixture : WebApplicationFactory<Program>, IAsy
 
         builder.ConfigureServices(services =>
         {
-            // Remove all IAM registration-related services to avoid connection errors in tests
-            var iamDescriptors = services
-                .Where(d => d.ServiceType.Name.Contains("IAM") ||
-                            d.ImplementationType?.Name.Contains("IAM") == true)
-                .ToList();
-
-            foreach (var descriptor in iamDescriptors)
+            // Ensure MassTransit waits until started for tests to avoid race conditions
+            services.Configure<MassTransitHostOptions>(options =>
             {
-                services.Remove(descriptor);
-            }
+                options.WaitUntilStarted = true;
+                options.StartTimeout = TimeSpan.FromSeconds(30);
+            });
 
             services.AddMassTransitTestHarness();
         });
