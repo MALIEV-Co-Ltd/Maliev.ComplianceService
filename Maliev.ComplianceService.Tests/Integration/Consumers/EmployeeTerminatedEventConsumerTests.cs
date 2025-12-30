@@ -1,7 +1,7 @@
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
-using Maliev.EmployeeService.Domain.IntegrationEvents;
+using Maliev.MessagingContracts.Generated;
 using Maliev.ComplianceService.Infrastructure.Consumers;
 using Maliev.ComplianceService.Tests.Fixtures;
 using MassTransit;
@@ -41,14 +41,31 @@ public class EmployeeTerminatedEventConsumerTests : IClassFixture<ComplianceServ
         var harness = _fixture.Services.GetRequiredService<ITestHarness>();
 
         // Act
-        await harness.Bus.Publish(new EmployeeTerminatedIntegrationEvent(
-            employeeId,
-            "EMP-001",
-            DateTime.UtcNow
-        ));
+        var payload = new EmployeeTerminatedEventPayload(
+            EmployeeId: employeeId,
+            TerminationDate: DateTimeOffset.UtcNow,
+            TerminationReason: "Test termination",
+            EligibleForRehire: false
+        );
+
+        var @event = new EmployeeTerminatedEvent(
+            MessageId: Guid.NewGuid(),
+            MessageName: "EmployeeTerminated",
+            MessageType: MessageType.Event,
+            MessageVersion: "1.0",
+            PublishedBy: "EmployeeService",
+            ConsumedBy: Array.Empty<string>(),
+            CorrelationId: Guid.NewGuid(),
+            CausationId: null,
+            OccurredAtUtc: DateTimeOffset.UtcNow,
+            IsPublic: false,
+            Payload: payload
+        );
+
+        await harness.Bus.Publish(@event);
 
         // Assert
-        Assert.True(await harness.Published.Any<EmployeeTerminatedIntegrationEvent>());
+        Assert.True(await harness.Published.Any<EmployeeTerminatedEvent>());
         
         // Give some time for consumer to process
         await Task.Delay(1000);
