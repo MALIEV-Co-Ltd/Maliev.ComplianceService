@@ -65,11 +65,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Recor
 builder.Services.AddScoped<IWorkAuthorizationRepository, WorkAuthorizationRepository>();
 builder.Services.AddScoped<IComplianceAlertRepository, ComplianceAlertRepository>();
 
-builder.Services.AddHttpClient<IEmployeeService, EmployeeServiceClient>(client =>
-{
-    var employeeServiceUrl = builder.Configuration["EmployeeService:Url"] ?? "http://employee-service";
-    client.BaseAddress = new Uri(employeeServiceUrl);
-}).AddStandardResilienceHandler();
+builder.AddServiceClient<IEmployeeService, EmployeeServiceClient>("EmployeeService");
 
 builder.Services.AddHostedService<WorkAuthorizationExpirationReminderService>();
 builder.Services.AddHostedService<ExpiredWorkAuthorizationFlaggingService>();
