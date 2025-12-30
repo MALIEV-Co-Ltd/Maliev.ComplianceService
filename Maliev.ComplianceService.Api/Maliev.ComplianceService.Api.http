@@ -1,0 +1,6 @@
+@Maliev.ComplianceService.Api_HostAddress = http://localhost:5205
+
+GET {{Maliev.ComplianceService.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
