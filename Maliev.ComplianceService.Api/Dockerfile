@@ -14,13 +14,13 @@ COPY ["Maliev.ComplianceService.Api/Maliev.ComplianceService.Api.csproj", "Malie
 COPY ["Maliev.ComplianceService.Application/Maliev.ComplianceService.Application.csproj", "Maliev.ComplianceService.Application/"]
 COPY ["Maliev.ComplianceService.Domain/Maliev.ComplianceService.Domain.csproj", "Maliev.ComplianceService.Domain/"]
 COPY ["Maliev.ComplianceService.Infrastructure/Maliev.ComplianceService.Infrastructure.csproj", "Maliev.ComplianceService.Infrastructure/"]
-COPY ["../Maliev.Aspire/Maliev.Aspire.ServiceDefaults/Maliev.Aspire.ServiceDefaults.csproj", "Maliev.Aspire/Maliev.Aspire.ServiceDefaults/"]
+
 
 RUN --mount=type=secret,id=nuget_username \
-    --mount=type=secret,id=nuget_password \
-    NUGET_USERNAME=$(cat /run/secrets/nuget_username) \
-    NUGET_PASSWORD=$(cat /run/secrets/nuget_password) \
-    dotnet restore "./Maliev.ComplianceService.Api/Maliev.ComplianceService.Api.csproj"
+  --mount=type=secret,id=nuget_password \
+  NUGET_USERNAME=$(cat /run/secrets/nuget_username) \
+  NUGET_PASSWORD=$(cat /run/secrets/nuget_password) \
+  dotnet restore "./Maliev.ComplianceService.Api/Maliev.ComplianceService.Api.csproj"
 
 COPY . .
 WORKDIR "/src/Maliev.ComplianceService.Api"
