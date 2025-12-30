@@ -1,0 +1,653 @@
+openapi: 3.0.3
+info:
+  title: Compliance Service API
+  description: |
+    Manages work authorizations, visas, permits, and employment compliance tracking.
+
+    ## Features
+    - Work authorization CRUD operations
+    - Automated expiration monitoring and alerts
+    - Compliance status reporting
+    - Integration with Employee, Upload, and Notification services
+
+    ## Base Path
+    All endpoints are prefixed with `/compliance/v1`
+
+  version: 1.0.0
+  contact:
+    name: MALIEV Engineering
+    email: engineering@maliev.com
+
+servers:
+  - url: https://api.maliev.com/compliance/v1
+    description: Production
+  - url: https://staging-api.maliev.com/compliance/v1
+    description: Staging
+  - url: http://localhost:8080/compliance/v1
+    description: Local Development
+
+tags:
+  - name: Work Authorizations
+    description: Manage employee work authorizations
+  - name: Alerts
+    description: Manage compliance alerts
+  - name: Reports
+    description: Generate compliance reports
+
+security:
+  - BearerAuth: []
+
+paths:
+  /employees/{employeeId}/work-authorization:
+    post:
+      tags:
+        - Work Authorizations
+      summary: Record work authorization
+      description: Creates a new work authorization record for an employee
+      operationId: recordWorkAuthorization
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordWorkAuthorizationRequest'
+      responses:
+        '201':
+          description: Work authorization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordWorkAuthorizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/EmployeeNotFound'
+        '409':
+          $ref: '#/components/responses/DuplicateAuthorization'
+
+    get:
+      tags:
+        - Work Authorizations
+      summary: Get employee work authorizations
+      description: Retrieves all work authorizations for a specific employee
+      operationId: getEmployeeWorkAuthorizations
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: activeOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of work authorizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkAuthorizationResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/EmployeeNotFound'
+
+  /work-authorization/{authId}:
+    get:
+      tags:
+        - Work Authorizations
+      summary: Get work authorization by ID
+      operationId: getWorkAuthorization
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: authId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Work authorization details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkAuthorizationResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/AuthorizationNotFound'
+
+    put:
+      tags:
+        - Work Authorizations
+      summary: Update work authorization
+      description: Updates an existing work authorization record
+      operationId: updateWorkAuthorization
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: authId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkAuthorizationRequest'
+      responses:
+        '200':
+          description: Work authorization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkAuthorizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/AuthorizationNotFound'
+        '409':
+          $ref: '#/components/responses/ConcurrentModification'
+
+  /work-authorization/expiring:
+    get:
+      tags:
+        - Work Authorizations
+      summary: Get expiring authorizations
+      description: Retrieves work authorizations expiring within specified days
+      operationId: getExpiringAuthorizations
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: daysUntilExpiration
+          in: query
+          schema:
+            type: integer
+            default: 90
+            minimum: 1
+            maximum: 365
+      responses:
+        '200':
+          description: List of expiring authorizations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpiringAuthorizationResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /alerts:
+    get:
+      tags:
+        - Alerts
+      summary: Get compliance alerts
+      description: Retrieves compliance alerts with optional filters
+      operationId: getAlerts
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: resolved
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: severity
+          in: query
+          schema:
+            $ref: '#/components/schemas/AlertSeverity'
+        - name: employeeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComplianceAlertResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /alerts/{alertId}/resolve:
+    put:
+      tags:
+        - Alerts
+      summary: Resolve compliance alert
+      description: Marks a compliance alert as resolved with notes
+      operationId: resolveAlert
+      security:
+        - BearerAuth: ['compliance.manage']
+      parameters:
+        - name: alertId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveAlertRequest'
+      responses:
+        '200':
+          description: Alert resolved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceAlertResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/AlertNotFound'
+
+  /reports/compliance:
+    get:
+      tags:
+        - Reports
+      summary: Get compliance report
+      description: Generates compliance summary report with optional department filter
+      operationId: getComplianceReport
+      security:
+        - BearerAuth: ['compliance.reports']
+      parameters:
+        - name: departmentId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Compliance report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComplianceReportResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RecordWorkAuthorizationRequest:
+      type: object
+      required:
+        - authorizationType
+        - documentNumber
+        - issueDate
+      properties:
+        authorizationType:
+          $ref: '#/components/schemas/AuthorizationType'
+        documentNumber:
+          type: string
+          maxLength: 100
+          example: "EAC1234567890"
+        issueDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+          nullable: true
+        issuingAuthority:
+          type: string
+          maxLength: 200
+          example: "USCIS"
+        sponsorshipStatus:
+          $ref: '#/components/schemas/SponsorshipStatus'
+          nullable: true
+        rightToWorkDocumentId:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          maxLength: 2000
+
+    RecordWorkAuthorizationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        message:
+          type: string
+          example: "Work authorization recorded successfully"
+
+    UpdateWorkAuthorizationRequest:
+      type: object
+      properties:
+        expirationDate:
+          type: string
+          format: date-time
+          nullable: true
+        issuingAuthority:
+          type: string
+          maxLength: 200
+        sponsorshipStatus:
+          $ref: '#/components/schemas/SponsorshipStatus'
+          nullable: true
+        rightToWorkDocumentId:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          maxLength: 2000
+        rowVersion:
+          type: string
+          format: byte
+          description: Optimistic concurrency token
+
+    WorkAuthorizationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          type: string
+          format: uuid
+        employeeName:
+          type: string
+          example: "John Doe"
+        authorizationType:
+          $ref: '#/components/schemas/AuthorizationType'
+        documentNumber:
+          type: string
+        issueDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+          nullable: true
+        daysUntilExpiration:
+          type: integer
+          nullable: true
+        issuingAuthority:
+          type: string
+          nullable: true
+        sponsorshipStatus:
+          $ref: '#/components/schemas/SponsorshipStatus'
+          nullable: true
+        complianceStatus:
+          $ref: '#/components/schemas/ComplianceStatus'
+        createdDate:
+          type: string
+          format: date-time
+        modifiedDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    ExpiringAuthorizationResponse:
+      allOf:
+        - $ref: '#/components/schemas/WorkAuthorizationResponse'
+
+    ComplianceAlertResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        employeeId:
+          type: string
+          format: uuid
+        employeeName:
+          type: string
+        alertType:
+          $ref: '#/components/schemas/AlertType'
+        severity:
+          $ref: '#/components/schemas/AlertSeverity'
+        message:
+          type: string
+        isResolved:
+          type: boolean
+        resolvedDate:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedByName:
+          type: string
+          nullable: true
+        resolutionNotes:
+          type: string
+          nullable: true
+        createdDate:
+          type: string
+          format: date-time
+
+    ResolveAlertRequest:
+      type: object
+      required:
+        - resolutionNotes
+      properties:
+        resolutionNotes:
+          type: string
+          maxLength: 2000
+
+    ComplianceReportResponse:
+      type: object
+      properties:
+        reportDate:
+          type: string
+          format: date-time
+        totalEmployees:
+          type: integer
+        requiresAuthorization:
+          type: integer
+        compliant:
+          type: integer
+        expiringSoon:
+          type: integer
+        expired:
+          type: integer
+        complianceRate:
+          type: number
+          format: float
+          description: Percentage (0-100)
+        byAuthorizationType:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorizationTypeBreakdown'
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceAlertResponse'
+
+    AuthorizationTypeBreakdown:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AuthorizationType'
+        count:
+          type: integer
+        expiringSoon:
+          type: integer
+        expired:
+          type: integer
+
+    AuthorizationType:
+      type: string
+      enum:
+        - Citizen
+        - PermanentResident
+        - WorkVisa
+        - StudentVisa
+        - TemporaryWorker
+        - Refugee
+        - Asylee
+        - Other
+
+    SponsorshipStatus:
+      type: string
+      enum:
+        - NotRequired
+        - Sponsored
+        - TransferPending
+        - RenewalPending
+        - Expired
+
+    ComplianceStatus:
+      type: string
+      enum:
+        - Compliant
+        - ExpiringSoon
+        - Expired
+        - PendingVerification
+        - NonCompliant
+
+    AlertType:
+      type: string
+      enum:
+        - ExpirationWarning
+        - Expired
+        - DocumentMissing
+        - VerificationRequired
+        - RenewalReminder
+
+    AlertSeverity:
+      type: string
+      enum:
+        - Low
+        - Medium
+        - High
+        - Critical
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "INVALID_DATE_RANGE"
+        message:
+          type: string
+          example: "Issue date cannot be after expiration date"
+        details:
+          type: object
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid_date_range:
+              value:
+                code: "INVALID_DATE_RANGE"
+                message: "Issue date cannot be after expiration date"
+            invalid_document_number:
+              value:
+                code: "INVALID_DOCUMENT_NUMBER"
+                message: "Document number format is invalid"
+
+    Forbidden:
+      description: Not authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: "NOT_AUTHORIZED"
+            message: "User lacks required permissions"
+
+    EmployeeNotFound:
+      description: Employee not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: "EMPLOYEE_NOT_FOUND"
+            message: "Employee with the specified ID does not exist"
+
+    AuthorizationNotFound:
+      description: Work authorization not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: "AUTHORIZATION_NOT_FOUND"
+            message: "Work authorization with the specified ID does not exist"
+
+    AlertNotFound:
+      description: Alert not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: "ALERT_NOT_FOUND"
+            message: "Alert with the specified ID does not exist"
+
+    DuplicateAuthorization:
+      description: Duplicate active authorization
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: "DUPLICATE_AUTHORIZATION"
+            message: "Employee already has an active authorization of this type"
+
+    ConcurrentModification:
+      description: Concurrent modification detected
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: "CONCURRENT_MODIFICATION"
+            message: "Record was modified by another user. Please refresh and try again"
