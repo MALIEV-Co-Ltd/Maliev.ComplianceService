@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Maliev.ComplianceService.Tests.Integration.Events;
 
+[Collection("IntegrationTests")]
 public class EventPublishingTests : IClassFixture<ComplianceServiceTestFixture>
 {
     private readonly ComplianceServiceTestFixture _fixture;

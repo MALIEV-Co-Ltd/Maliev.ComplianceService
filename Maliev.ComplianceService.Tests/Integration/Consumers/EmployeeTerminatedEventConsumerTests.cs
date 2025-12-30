@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Maliev.ComplianceService.Tests.Integration.Consumers;
 
+[Collection("IntegrationTests")]
 public class EmployeeTerminatedEventConsumerTests : IClassFixture<ComplianceServiceTestFixture>
 {
     private readonly ComplianceServiceTestFixture _fixture;

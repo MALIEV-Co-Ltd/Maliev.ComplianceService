@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Maliev.ComplianceService.Tests.Integration.BackgroundServices;
 
+[Collection("IntegrationTests")]
 public class AlertGenerationTests : IClassFixture<ComplianceServiceTestFixture>
 {
     private readonly ComplianceServiceTestFixture _fixture;

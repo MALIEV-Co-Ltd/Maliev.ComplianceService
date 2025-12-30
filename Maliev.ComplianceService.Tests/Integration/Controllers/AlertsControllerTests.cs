@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Maliev.ComplianceService.Tests.Integration.Controllers;
 
+[Collection("IntegrationTests")]
 public class AlertsControllerTests : IClassFixture<ComplianceServiceTestFixture>
 {
     private readonly ComplianceServiceTestFixture _fixture;
