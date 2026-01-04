@@ -1,7 +1,6 @@
 using Maliev.ComplianceService.Infrastructure.Data;
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Infrastructure.Repositories;
-using Maliev.ComplianceService.Api.Middlewares;
 using Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
 using Maliev.ComplianceService.Infrastructure.Services;
 using Maliev.ComplianceService.Infrastructure.BackgroundServices;

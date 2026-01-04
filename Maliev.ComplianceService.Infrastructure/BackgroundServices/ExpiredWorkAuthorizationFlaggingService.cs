@@ -88,14 +88,13 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
             if (!auth.ExpirationDate.HasValue) continue;
 
             var expiredDays = (DateTime.UtcNow.Date - auth.ExpirationDate.Value.Date).Days;
-            await publishEndpoint.Publish(new WorkAuthorizationExpiredEvent(
-                auth.Id,
-                auth.EmployeeId,
-                auth.AuthorizationType,
-                auth.ExpirationDate.Value,
-                expiredDays,
-                DateTime.UtcNow
-            ), cancellationToken);
+                        await publishEndpoint.Publish(new WorkAuthorizationExpiredEvent(
+                            auth.Id,
+                            auth.EmployeeId,
+                            auth.AuthorizationType.ToString(),
+                            auth.ExpirationDate.Value,
+                            expiredDays,
+                            DateTime.UtcNow), cancellationToken);
 
             // FR-018: AccessRevocationRequiredEvent after 30 days
             if (expiredDays >= 30)

@@ -3,6 +3,7 @@ using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
+using MassTransit;
 using Moq;
 using Xunit;
 
@@ -10,13 +11,13 @@ namespace Maliev.ComplianceService.Tests.Unit.Commands;
 
 public class RecordWorkAuthorizationCommandHandlerTests
 {
-    private readonly Mock<IWorkAuthorizationRepository> _repositoryMock;
+    private readonly Mock<IWorkAuthorizationRepository> _repositoryMock = new();
+    private readonly Mock<IPublishEndpoint> _publishEndpointMock = new();
     private readonly RecordWorkAuthorizationCommandHandler _handler;
 
     public RecordWorkAuthorizationCommandHandlerTests()
     {
-        _repositoryMock = new Mock<IWorkAuthorizationRepository>();
-        _handler = new RecordWorkAuthorizationCommandHandler(_repositoryMock.Object);
+        _handler = new RecordWorkAuthorizationCommandHandler(_repositoryMock.Object, _publishEndpointMock.Object);
     }
 
     [Fact]
