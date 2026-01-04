@@ -4,6 +4,7 @@ using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Application.Mappers;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
+using MassTransit;
 using MediatR;
 
 namespace Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
@@ -14,15 +15,18 @@ namespace Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
 public class RecordWorkAuthorizationCommandHandler : IRequestHandler<RecordWorkAuthorizationCommand, WorkAuthorizationResponse>
 {
     private readonly IWorkAuthorizationRepository _repository;
+    private readonly IPublishEndpoint _publishEndpoint;
     private readonly RecordWorkAuthorizationValidator _validator;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordWorkAuthorizationCommandHandler"/> class.
     /// </summary>
     /// <param name="repository">The work authorization repository.</param>
-    public RecordWorkAuthorizationCommandHandler(IWorkAuthorizationRepository repository)
+    /// <param name="publishEndpoint">The publish endpoint.</param>
+    public RecordWorkAuthorizationCommandHandler(IWorkAuthorizationRepository repository, IPublishEndpoint publishEndpoint)
     {
         _repository = repository;
+        _publishEndpoint = publishEndpoint;
         _validator = new RecordWorkAuthorizationValidator();
     }
 
@@ -60,6 +64,28 @@ public class RecordWorkAuthorizationCommandHandler : IRequestHandler<RecordWorkA
         };
 
         var created = await _repository.AddAsync(entity, cancellationToken);
+
+        if (created.RightToWorkDocumentId.HasValue)
+        {
+            await _publishEndpoint.Publish(new Maliev.MessagingContracts.Generated.ComplianceDocumentUploadedEvent(
+                MessageId: Guid.NewGuid(),
+                MessageName: nameof(Maliev.MessagingContracts.Generated.ComplianceDocumentUploadedEvent),
+                MessageType: Maliev.MessagingContracts.Generated.MessageType.Event,
+                MessageVersion: "1.0",
+                PublishedBy: "ComplianceService",
+                ConsumedBy: Array.Empty<string>(),
+                CorrelationId: Guid.NewGuid(),
+                CausationId: null,
+                OccurredAtUtc: DateTimeOffset.UtcNow,
+                IsPublic: false,
+                Payload: new Maliev.MessagingContracts.Generated.ComplianceDocumentUploadedEventPayload(
+                    DocumentId: created.RightToWorkDocumentId.Value,
+                    EmployeeId: created.EmployeeId,
+                    DocumentType: created.AuthorizationType.ToString(),
+                    UploadDate: DateTime.UtcNow
+                )
+            ), cancellationToken);
+        }
         
         return DtoMapper.ToDto(created);
     }
