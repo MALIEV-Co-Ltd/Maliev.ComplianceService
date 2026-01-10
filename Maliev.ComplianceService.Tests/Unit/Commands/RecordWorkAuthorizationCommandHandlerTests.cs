@@ -50,8 +50,8 @@ public class RecordWorkAuthorizationCommandHandlerTests
         Assert.NotNull(result);
         Assert.Equal(request.DocumentNumber, result.DocumentNumber);
         Assert.Equal(ComplianceStatus.Compliant, result.ComplianceStatus);
-        
-        _repositoryMock.Verify(r => r.AddAsync(It.Is<WorkAuthorization>(w => 
+
+        _repositoryMock.Verify(r => r.AddAsync(It.Is<WorkAuthorization>(w =>
             w.EmployeeId == command.EmployeeId &&
             w.DocumentNumber == request.DocumentNumber &&
             w.ComplianceStatus == ComplianceStatus.Compliant

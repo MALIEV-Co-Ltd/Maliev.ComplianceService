@@ -1,5 +1,6 @@
 using Maliev.Aspire.ServiceDefaults.IAM;
 using Maliev.ComplianceService.Domain.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Maliev.ComplianceService.Infrastructure.IAM;
@@ -12,19 +13,23 @@ public class ComplianceIAMRegistrationService : IAMRegistrationService
     /// <summary>
     /// Initializes a new instance of the <see cref="ComplianceIAMRegistrationService"/> class.
     /// </summary>
-    public ComplianceIAMRegistrationService(IHttpClientFactory httpClientFactory, ILogger<ComplianceIAMRegistrationService> logger)
-        : base(httpClientFactory, logger, "ComplianceService")
+    /// <param name="configuration">The application configuration.</param>
+    /// <param name="logger">Logger instance.</param>
+    public ComplianceIAMRegistrationService(
+        IConfiguration configuration,
+        ILogger<ComplianceIAMRegistrationService> logger)
+        : base(configuration, logger, "compliance")
     {
     }
 
     /// <inheritdoc/>
     protected override IEnumerable<PermissionRegistration> GetPermissions()
     {
-        return new[]
+        return CompliancePermissions.All.Select(p => new PermissionRegistration
         {
-            new PermissionRegistration { PermissionId = CompliancePermissions.Manage, Description = "Manage work authorizations and compliance documents" },
-            new PermissionRegistration { PermissionId = CompliancePermissions.Reports, Description = "View compliance reports and audits" }
-        };
+            PermissionId = p.Key,
+            Description = p.Value
+        });
     }
 
     /// <inheritdoc/>
@@ -33,3 +38,4 @@ public class ComplianceIAMRegistrationService : IAMRegistrationService
         return Enumerable.Empty<RoleRegistration>();
     }
 }
+

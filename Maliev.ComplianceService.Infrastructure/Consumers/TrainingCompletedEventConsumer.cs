@@ -1,4 +1,4 @@
-using Maliev.ComplianceService.Domain.Events;
+using Maliev.MessagingContracts.Generated;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -23,8 +23,9 @@ public class TrainingCompletedEventConsumer : IConsumer<TrainingCompletedEvent>
     /// <inheritdoc/>
     public Task Consume(ConsumeContext<TrainingCompletedEvent> context)
     {
-        _logger.LogInformation("Processing TrainingCompletedEvent for Employee: {EmployeeId}, Course: {CourseName}", 
-            context.Message.EmployeeId, context.Message.CourseName);
+        var payload = context.Message.Payload;
+        _logger.LogInformation("Processing TrainingCompletedEvent for Employee: {EmployeeId}, Course: {CourseName}",
+            payload.EmployeeId, payload.CourseName);
         // FR-021: Stub for future certification tracking
         return Task.CompletedTask;
     }

@@ -37,7 +37,7 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
         };
 
         // Act
-        var response = await _client.PostAsJsonSnakeCaseAsync($"/employees/{employeeId}/work-authorization", request);
+        var response = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -61,10 +61,10 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
             ExpirationDate = DateTime.UtcNow.AddDays(10), // Expiring soon
             RightToWorkDocumentId = Guid.NewGuid()
         };
-        await _client.PostAsJsonSnakeCaseAsync($"/employees/{employeeId}/work-authorization", request);
+        await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", request);
 
         // Act
-        var response = await _client.GetAsync("/work-authorization/expiring?daysUntilExpiration=30");
+        var response = await _client.GetAsync("/compliance/v1/work-authorizations/expiring?daysUntilExpiration=30");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -86,7 +86,7 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
             ExpirationDate = DateTime.UtcNow.AddDays(100),
             RightToWorkDocumentId = Guid.NewGuid()
         };
-        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/employees/{employeeId}/work-authorization", recordRequest);
+        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
         var auth = await recordResponse.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
 
         var updateRequest = new UpdateWorkAuthorizationRequest
@@ -94,9 +94,9 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
             ExpirationDate = DateTime.UtcNow.AddDays(200),
             RowVersion = auth!.RowVersion
         };
-        
+
         // Act
-        var response = await _client.PutAsJsonSnakeCaseAsync($"/work-authorization/{auth.Id}", updateRequest);
+        var response = await _client.PutAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/{auth.Id}", updateRequest);
 
         // Assert
         if (response.StatusCode != HttpStatusCode.OK)
@@ -104,7 +104,7 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
             var error = await response.Content.ReadAsStringAsync();
             throw new Exception($"Update failed with {response.StatusCode}: {error}");
         }
-        
+
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var updated = await response.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
         Assert.NotNull(updated);
@@ -122,11 +122,11 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
             DocumentNumber = "GET-ID-001",
             IssueDate = DateTime.UtcNow.AddDays(-30)
         };
-        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/employees/{employeeId}/work-authorization", recordRequest);
+        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
         var auth = await recordResponse.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
 
         // Act
-        var response = await _client.GetAsync($"/work-authorization/{auth!.Id}");
+        var response = await _client.GetAsync($"/compliance/v1/work-authorizations/{auth!.Id}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -145,10 +145,10 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
             DocumentNumber = "GET-EMP-001",
             IssueDate = DateTime.UtcNow.AddDays(-30)
         };
-        await _client.PostAsJsonSnakeCaseAsync($"/employees/{employeeId}/work-authorization", recordRequest);
+        await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
 
         // Act
-        var response = await _client.GetAsync($"/employees/{employeeId}/work-authorization");
+        var response = await _client.GetAsync($"/compliance/v1/work-authorizations/employees/{employeeId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

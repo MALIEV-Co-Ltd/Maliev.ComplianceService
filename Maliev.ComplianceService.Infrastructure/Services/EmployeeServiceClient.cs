@@ -30,7 +30,7 @@ public class EmployeeServiceClient : IEmployeeService
             // In a real implementation, we would call the Employee Service
             // var response = await _httpClient.GetAsync($"/api/employees/{employeeId}", cancellationToken);
             // ...
-            
+
             // For now, return a placeholder as per FR-031 if it fails or if we want to stub it
             return "(name unavailable)";
         }

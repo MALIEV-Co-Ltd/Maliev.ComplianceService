@@ -25,8 +25,8 @@ public static class DtoMapper
             DocumentNumber = entity.DocumentNumber,
             IssueDate = entity.IssueDate,
             ExpirationDate = entity.ExpirationDate,
-            DaysUntilExpiration = entity.ExpirationDate.HasValue 
-                ? (entity.ExpirationDate.Value - DateTime.UtcNow).Days 
+            DaysUntilExpiration = entity.ExpirationDate.HasValue
+                ? (entity.ExpirationDate.Value - DateTime.UtcNow).Days
                 : null,
             IssuingAuthority = entity.IssuingAuthority,
             SponsorshipStatus = entity.SponsorshipStatus,
@@ -54,8 +54,8 @@ public static class DtoMapper
             DocumentNumber = entity.DocumentNumber,
             IssueDate = entity.IssueDate,
             ExpirationDate = entity.ExpirationDate,
-            DaysUntilExpiration = entity.ExpirationDate.HasValue 
-                ? (entity.ExpirationDate.Value - DateTime.UtcNow).Days 
+            DaysUntilExpiration = entity.ExpirationDate.HasValue
+                ? (entity.ExpirationDate.Value - DateTime.UtcNow).Days
                 : null,
             IssuingAuthority = entity.IssuingAuthority,
             SponsorshipStatus = entity.SponsorshipStatus,

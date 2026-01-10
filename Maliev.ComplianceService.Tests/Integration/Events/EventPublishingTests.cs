@@ -21,7 +21,7 @@ public class EventPublishingTests : IClassFixture<ComplianceServiceTestFixture>
     {
         // Arrange
         var harness = _fixture.Services.GetRequiredService<ITestHarness>();
-        
+
         // Act
         await harness.Bus.Publish(new WorkAuthorizationExpiringEvent(
             Guid.NewGuid(),

@@ -23,7 +23,7 @@ public class AlertGenerationTests : IClassFixture<ComplianceServiceTestFixture>
         // This is a bit tricky to test with a real BackgroundService because of the 24h delay.
         // In a real scenario, we might want to test the internal logic directly or use a shorter delay for tests.
         // For now, I'll assume we want to verify that the logic works by manually invoking it or checking the results.
-        
+
         // Arrange
         using var scope = _fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComplianceDbContext>();
@@ -45,7 +45,7 @@ public class AlertGenerationTests : IClassFixture<ComplianceServiceTestFixture>
         // Act - We would normally wait for the background service or trigger it.
         // Since we can't easily trigger the BackgroundService's loop, we might just test the handler if it was separate.
         // But for this test, let's just check if we can get the alerts after some time or if we have another way.
-        
+
         // I will skip the "Wait" part and just assume we would have a way to trigger it.
         // For the sake of the task, I'll just verify the API returns what we expect if alerts existed.
     }

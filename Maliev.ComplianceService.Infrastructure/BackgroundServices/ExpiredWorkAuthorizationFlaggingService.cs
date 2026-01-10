@@ -24,7 +24,7 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="logger">The logger.</param>
     public ExpiredWorkAuthorizationFlaggingService(
-        IServiceProvider serviceProvider, 
+        IServiceProvider serviceProvider,
         ILogger<ExpiredWorkAuthorizationFlaggingService> logger)
     {
         _serviceProvider = serviceProvider;
@@ -88,16 +88,16 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
             if (!auth.ExpirationDate.HasValue) continue;
 
             var expiredDays = (DateTime.UtcNow.Date - auth.ExpirationDate.Value.Date).Days;
-                        await publishEndpoint.Publish(new WorkAuthorizationExpiredEvent(
-                            auth.Id,
-                            auth.EmployeeId,
-                            auth.AuthorizationType.ToString(),
-                            auth.ExpirationDate.Value,
-                            expiredDays,
-                            DateTime.UtcNow), cancellationToken);
+            await publishEndpoint.Publish(new WorkAuthorizationExpiredEvent(
+                auth.Id,
+                auth.EmployeeId,
+                auth.AuthorizationType.ToString(),
+                auth.ExpirationDate.Value,
+                expiredDays,
+                DateTime.UtcNow), cancellationToken);
 
             // FR-018: AccessRevocationRequiredEvent after 30 days
-            if (expiredDays >= 30)
+            if (expiredDays >= 30 && !auth.AccessRevocationSentDate.HasValue)
             {
                 await publishEndpoint.Publish(new AccessRevocationRequiredEvent(
                     auth.EmployeeId,
@@ -107,7 +107,10 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
                     expiredDays,
                     DateTime.UtcNow
                 ), cancellationToken);
-                
+
+                auth.AccessRevocationSentDate = DateTime.UtcNow;
+                await repository.UpdateAsync(auth, cancellationToken);
+
                 _logger.LogInformation("Published AccessRevocationRequiredEvent for employee {EmployeeId}", auth.EmployeeId);
             }
 

@@ -22,7 +22,7 @@ public class ReportsControllerTests : IClassFixture<ComplianceServiceTestFixture
     public async Task GetComplianceReport_ReturnsReport()
     {
         // Act
-        var response = await _client.GetAsync("/reports/compliance");
+        var response = await _client.GetAsync("/compliance/v1/compliance-reports/compliance");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

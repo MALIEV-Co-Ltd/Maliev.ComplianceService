@@ -33,7 +33,7 @@ public class GetExpiringAuthorizationsQueryHandler : IRequestHandler<GetExpiring
     public async Task<IEnumerable<ExpiringAuthorizationResponse>> Handle(GetExpiringAuthorizationsQuery query, CancellationToken cancellationToken)
     {
         var authorizations = await _repository.GetExpiringWithinDaysAsync(query.DaysUntilExpiration, cancellationToken);
-        
+
         var results = new List<ExpiringAuthorizationResponse>();
         foreach (var auth in authorizations)
         {

@@ -71,6 +71,16 @@ public class WorkAuthorization
     public bool IsActive { get; set; } = true;
 
     /// <summary>
+    /// The last expiration threshold (90, 60, 30) for which an alert was generated.
+    /// </summary>
+    public int? LastExpirationAlertThreshold { get; set; }
+
+    /// <summary>
+    /// Timestamp when the access revocation event was published.
+    /// </summary>
+    public DateTime? AccessRevocationSentDate { get; set; }
+
+    /// <summary>
     /// Current compliance status (auto-calculated from expiration date)
     /// </summary>
     [Required]

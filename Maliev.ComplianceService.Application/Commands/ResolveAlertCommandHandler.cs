@@ -39,7 +39,7 @@ public class ResolveAlertCommandHandler : IRequestHandler<ResolveAlertCommand, b
         alert.ResolutionNotes = command.Request.ResolutionNotes;
 
         await _repository.UpdateAsync(alert, cancellationToken);
-        
+
         return true;
     }
 }

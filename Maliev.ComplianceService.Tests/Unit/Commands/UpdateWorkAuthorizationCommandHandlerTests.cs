@@ -54,7 +54,7 @@ public class UpdateWorkAuthorizationCommandHandlerTests
     {
         // Arrange
         var authId = Guid.NewGuid();
-        var existingAuth = new WorkAuthorization { Id = authId, RowVersion = Guid.NewGuid() }; 
+        var existingAuth = new WorkAuthorization { Id = authId, RowVersion = Guid.NewGuid() };
         var request = new UpdateWorkAuthorizationRequest
         {
             RowVersion = Guid.NewGuid() // Different RowVersion

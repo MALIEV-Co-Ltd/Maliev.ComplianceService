@@ -24,9 +24,12 @@ public class GetComplianceReportQueryHandlerTests
     {
         // Arrange
         var query = new GetComplianceReportQuery();
-        
-        _repositoryMock.Setup(r => r.GetByComplianceStatusAsync(ComplianceStatus.Compliant, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Maliev.ComplianceService.Domain.Entities.WorkAuthorization> { new() });
+
+        _repositoryMock.Setup(r => r.GetComplianceStatsAsync(It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<ComplianceStatus, int> { { ComplianceStatus.Compliant, 1 } });
+
+        _repositoryMock.Setup(r => r.GetTypeBreakdownAsync(It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Maliev.ComplianceService.Application.DTOs.AuthorizationTypeBreakdown>());
 
         _alertRepositoryMock.Setup(r => r.GetAlertsAsync(false, null, null, null, null, null, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Maliev.ComplianceService.Domain.Entities.ComplianceAlert>());

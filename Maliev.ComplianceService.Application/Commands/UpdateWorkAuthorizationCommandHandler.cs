@@ -40,7 +40,6 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
         // Optimistic locking check
         if (auth.RowVersion != command.Request.RowVersion)
         {
-            // For debugging: Console.WriteLine($"Mismatch: DB={auth.RowVersion}, REQ={command.Request.RowVersion}");
             throw new DbUpdateConcurrencyException("CONCURRENT_MODIFICATION");
         }
 
@@ -65,7 +64,7 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
         auth.RowVersion = Guid.NewGuid();
 
         var updated = await _repository.UpdateAsync(auth, cancellationToken);
-        
+
         return DtoMapper.ToDto(updated);
     }
 }

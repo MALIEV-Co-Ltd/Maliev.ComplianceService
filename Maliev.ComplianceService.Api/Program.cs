@@ -1,3 +1,4 @@
+using Maliev.Aspire.ServiceDefaults;
 using Maliev.ComplianceService.Infrastructure.Data;
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Infrastructure.Repositories;
@@ -20,7 +21,7 @@ builder.AddStandardMiddleware(options =>
 {
     options.EnableRequestLogging = true;
 });
-builder.AddServiceMeters("compliance-service");
+builder.AddServiceMeters("compliance-meter");
 
 // Database
 builder.AddPostgresDbContext<ComplianceDbContext>(connectionName: "ComplianceDbContext");
@@ -38,7 +39,10 @@ builder.AddMassTransitWithRabbitMq(x =>
 
 // Authentication & Authorization
 builder.AddJwtAuthentication();
-builder.Services.AddIAMRegistration<ComplianceIAMRegistrationService>();
+
+// IAM Registration
+builder.AddIAMServiceClient("compliance");
+builder.Services.AddIAMRegistration<ComplianceIAMRegistrationService>("compliance");
 
 // --- API Configuration ---
 builder.AddDefaultCors();
@@ -84,7 +88,10 @@ catch (Exception ex)
 
 // --- Middleware Pipeline ---
 app.UseStandardMiddleware();
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseRouting();
 app.UseCors();
 app.UseAuthentication();

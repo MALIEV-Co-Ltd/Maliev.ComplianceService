@@ -2,6 +2,7 @@ using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Queries.GetComplianceReport;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 
@@ -9,7 +10,8 @@ namespace Maliev.ComplianceService.Api.Controllers;
 /// Controller for generating organizational compliance reports.
 /// </summary>
 [ApiController]
-[Route("reports")]
+[ApiVersion("1.0")]
+[Route("compliance/v{version:apiVersion}/compliance-reports")]
 public class ReportsController : ControllerBase
 {
     private readonly IMediator _mediator;
