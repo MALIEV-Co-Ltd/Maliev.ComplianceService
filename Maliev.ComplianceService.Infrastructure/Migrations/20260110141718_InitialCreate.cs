@@ -26,6 +26,8 @@ namespace Maliev.ComplianceService.Infrastructure.Migrations
                     right_to_work_document_id = table.Column<Guid>(type: "uuid", nullable: true),
                     notes = table.Column<string>(type: "text", nullable: true),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    last_expiration_alert_threshold = table.Column<int>(type: "integer", nullable: true),
+                    access_revocation_sent_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     compliance_status = table.Column<int>(type: "integer", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     modified_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

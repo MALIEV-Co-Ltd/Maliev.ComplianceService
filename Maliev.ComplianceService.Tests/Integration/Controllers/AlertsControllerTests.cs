@@ -24,7 +24,7 @@ public class AlertsControllerTests : IClassFixture<ComplianceServiceTestFixture>
     public async Task GetAlerts_ReturnsAlerts()
     {
         // Act
-        var response = await _client.GetAsync("/alerts");
+        var response = await _client.GetAsync("/compliance/v1/compliance-alerts");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -45,7 +45,7 @@ public class AlertsControllerTests : IClassFixture<ComplianceServiceTestFixture>
             ExpirationDate = DateTime.UtcNow.AddDays(100),
             RightToWorkDocumentId = Guid.NewGuid()
         };
-        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/employees/{employeeId}/work-authorization", recordRequest);
+        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
         var auth = await recordResponse.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
 
         using var scope = _fixture.Services.CreateScope();
@@ -69,13 +69,13 @@ public class AlertsControllerTests : IClassFixture<ComplianceServiceTestFixture>
         };
 
         // Act
-        var response = await _client.PutAsJsonSnakeCaseAsync($"/alerts/{alert.Id}/resolve", request);
+        var response = await _client.PutAsJsonSnakeCaseAsync($"/compliance/v1/compliance-alerts/{alert.Id}/resolve", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         // Verify it's resolved in the list
-        var getResponse = await _client.GetAsync($"/alerts?isResolved=true&employeeId={alert.EmployeeId}");
+        var getResponse = await _client.GetAsync($"/compliance/v1/compliance-alerts?isResolved=true&employeeId={alert.EmployeeId}");
         var alerts = await getResponse.Content.ReadFromJsonSnakeCaseAsync<IEnumerable<ComplianceAlertResponse>>();
         Assert.Contains(alerts!, a => a.Id == alert.Id);
     }

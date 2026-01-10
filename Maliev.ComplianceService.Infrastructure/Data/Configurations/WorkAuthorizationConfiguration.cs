@@ -72,6 +72,13 @@ public class WorkAuthorizationConfiguration : IEntityTypeConfiguration<WorkAutho
             .HasConversion<int>()
             .IsRequired();
 
+        builder.Property(w => w.LastExpirationAlertThreshold)
+            .HasColumnName("last_expiration_alert_threshold");
+
+        builder.Property(w => w.AccessRevocationSentDate)
+            .HasColumnName("access_revocation_sent_date")
+            .HasColumnType("timestamp with time zone");
+
         builder.Property(w => w.CreatedDate)
             .HasColumnName("created_date")
             .HasColumnType("timestamp with time zone")

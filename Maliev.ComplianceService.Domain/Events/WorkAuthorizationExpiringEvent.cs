@@ -13,10 +13,10 @@ namespace Maliev.ComplianceService.Domain.Events;
 /// <param name="Timestamp">The timestamp when the event occurred.</param>
 /// <param name="Version">The version of the event schema.</param>
 public record WorkAuthorizationExpiringEvent(
-    Guid AuthorizationId, 
-    Guid EmployeeId, 
-    AuthorizationType AuthorizationType, 
-    DateTime ExpirationDate, 
-    int DaysUntilExpiration, 
-    DateTime Timestamp, 
+    Guid AuthorizationId,
+    Guid EmployeeId,
+    AuthorizationType AuthorizationType,
+    DateTime ExpirationDate,
+    int DaysUntilExpiration,
+    DateTime Timestamp,
     string Version = "1.0");

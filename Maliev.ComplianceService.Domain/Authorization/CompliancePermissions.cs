@@ -1,19 +1,23 @@
 namespace Maliev.ComplianceService.Domain.Authorization;
 
 /// <summary>
-/// Defines permission constants for the Compliance Service
+/// Constants for Compliance Service permissions.
+/// Follows GCP-style naming: {service}.{resource}.{action}
 /// </summary>
 public static class CompliancePermissions
 {
-    /// <summary>
-    /// Permission to create, update, and view work authorizations and alerts.
-    /// Required for HR administrators managing compliance.
-    /// </summary>
+    /// <summary>Permission to manage work authorizations and documents.</summary>
     public const string Manage = "compliance.authorizations.manage";
 
-    /// <summary>
-    /// Permission to view compliance reports.
-    /// Required for HR managers and executives viewing organizational compliance status.
-    /// </summary>
+    /// <summary>Permission to view reports and audits.</summary>
     public const string Reports = "compliance.reports.view";
+
+    /// <summary>
+    /// Collection of all permissions for easy registration.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string> All = new Dictionary<string, string>
+    {
+        { Manage, "Manage work authorizations and compliance documents" },
+        { Reports, "View compliance reports and audits" }
+    };
 }

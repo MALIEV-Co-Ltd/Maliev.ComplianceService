@@ -86,7 +86,7 @@ public class RecordWorkAuthorizationCommandHandler : IRequestHandler<RecordWorkA
                 )
             ), cancellationToken);
         }
-        
+
         return DtoMapper.ToDto(created);
     }
 }

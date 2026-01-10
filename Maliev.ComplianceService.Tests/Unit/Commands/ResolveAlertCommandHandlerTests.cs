@@ -42,7 +42,7 @@ public class ResolveAlertCommandHandlerTests
         Assert.True(existingAlert.IsResolved);
         Assert.Equal(request.ResolvedBy, existingAlert.ResolvedBy);
         Assert.Equal(request.ResolutionNotes, existingAlert.ResolutionNotes);
-        
+
         _repositoryMock.Verify(r => r.UpdateAsync(It.Is<ComplianceAlert>(a => a.Id == alertId), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

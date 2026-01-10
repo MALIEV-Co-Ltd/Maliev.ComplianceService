@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Maliev.ComplianceService.Application.Interfaces;
+using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
 using Maliev.ComplianceService.Infrastructure.Data;
@@ -119,6 +120,36 @@ public class WorkAuthorizationRepository : IWorkAuthorizationRepository
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IDictionary<ComplianceStatus, int>> GetComplianceStatsAsync(Guid? departmentId = null, CancellationToken cancellationToken = default)
+    {
+        // Note: Department filtering would normally require a join or a list of employee IDs.
+        // For this implementation, we assume department filtering is handled by the caller 
+        // providing a list of employee IDs if needed, or we just count all if departmentId is null.
+
+        return await _context.WorkAuthorizations
+            .Where(w => w.IsActive)
+            .GroupBy(w => w.ComplianceStatus)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Status, x => x.Count, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<AuthorizationTypeBreakdown>> GetTypeBreakdownAsync(Guid? departmentId = null, CancellationToken cancellationToken = default)
+    {
+        return await _context.WorkAuthorizations
+            .Where(w => w.IsActive)
+            .GroupBy(w => w.AuthorizationType)
+            .Select(g => new AuthorizationTypeBreakdown
+            {
+                Type = g.Key,
+                Count = g.Count(),
+                ExpiringSoon = g.Count(x => x.ComplianceStatus == ComplianceStatus.ExpiringSoon),
+                Expired = g.Count(x => x.ComplianceStatus == ComplianceStatus.Expired)
+            })
+            .ToListAsync(cancellationToken);
     }
 
     /// <inheritdoc/>

@@ -28,7 +28,7 @@ public class EmployeeTerminatedEventConsumerTests : IClassFixture<ComplianceServ
         var employeeId = Guid.NewGuid();
         using var scope = _fixture.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IWorkAuthorizationRepository>();
-        
+
         await repository.AddAsync(new WorkAuthorization
         {
             EmployeeId = employeeId,
@@ -67,7 +67,7 @@ public class EmployeeTerminatedEventConsumerTests : IClassFixture<ComplianceServ
 
         // Assert
         Assert.True(await harness.Published.Any<EmployeeTerminatedEvent>());
-        
+
         // Give some time for consumer to process
         await Task.Delay(1000);
 

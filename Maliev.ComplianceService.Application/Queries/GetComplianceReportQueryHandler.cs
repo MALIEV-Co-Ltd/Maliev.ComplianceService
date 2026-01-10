@@ -24,7 +24,7 @@ public class GetComplianceReportQueryHandler : IRequestHandler<GetComplianceRepo
     /// <param name="alertRepository">The compliance alert repository.</param>
     /// <param name="cache">The distributed cache.</param>
     public GetComplianceReportQueryHandler(
-        IWorkAuthorizationRepository repository, 
+        IWorkAuthorizationRepository repository,
         IComplianceAlertRepository alertRepository,
         IDistributedCache cache)
     {
@@ -42,7 +42,7 @@ public class GetComplianceReportQueryHandler : IRequestHandler<GetComplianceRepo
     public async Task<ComplianceReportResponse> Handle(GetComplianceReportQuery query, CancellationToken cancellationToken)
     {
         var cacheKey = $"compliance_report_{query.DepartmentId ?? Guid.Empty}";
-        
+
         // Try to get from cache (simplified for now, usually we would check if cache is available)
         if (_cache != null)
         {
@@ -53,24 +53,32 @@ public class GetComplianceReportQueryHandler : IRequestHandler<GetComplianceRepo
             }
         }
 
-        // In a real implementation, we would use more efficient aggregation queries
-        // For now, let's use the repository methods we have
-        
-        var compliant = await _repository.GetByComplianceStatusAsync(ComplianceStatus.Compliant, cancellationToken);
-        var expiring = await _repository.GetByComplianceStatusAsync(ComplianceStatus.ExpiringSoon, cancellationToken);
-        var expired = await _repository.GetByComplianceStatusAsync(ComplianceStatus.Expired, cancellationToken);
-        
+        // Optimized aggregation using the new repository methods
+        var stats = await _repository.GetComplianceStatsAsync(query.DepartmentId, cancellationToken);
+        var typeBreakdown = await _repository.GetTypeBreakdownAsync(query.DepartmentId, cancellationToken);
+
         var activeAlerts = await _alertRepository.GetAlertsAsync(isResolved: false, cancellationToken: cancellationToken);
+
+        int compliantCount = stats.TryGetValue(ComplianceStatus.Compliant, out var c) ? c : 0;
+        int expiringSoonCount = stats.TryGetValue(ComplianceStatus.ExpiringSoon, out var es) ? es : 0;
+        int expiredCount = stats.TryGetValue(ComplianceStatus.Expired, out var e) ? e : 0;
+        int pendingCount = stats.TryGetValue(ComplianceStatus.PendingVerification, out var p) ? p : 0;
+        int nonCompliantCount = stats.TryGetValue(ComplianceStatus.NonCompliant, out var nc) ? nc : 0;
+
+        int totalTracked = compliantCount + expiringSoonCount + expiredCount + pendingCount + nonCompliantCount;
 
         var report = new ComplianceReportResponse
         {
             ReportDate = DateTime.UtcNow,
-            TotalEmployees = 0, // In a real implementation, we would get this from Employee Service
-            RequiresAuthorization = compliant.Count() + expiring.Count() + expired.Count(),
-            Compliant = compliant.Count(),
-            ExpiringSoon = expiring.Count(),
-            Expired = expired.Count(),
-            ComplianceRate = 0, // Calculate rate
+            TotalEmployees = 0, // This would normally come from Employee Service
+            RequiresAuthorization = totalTracked,
+            Compliant = compliantCount,
+            ExpiringSoon = expiringSoonCount,
+            Expired = expiredCount,
+            ComplianceRate = totalTracked > 0
+                ? Math.Round((decimal)compliantCount / totalTracked * 100, 2)
+                : 100,
+            ByAuthorizationType = typeBreakdown.ToList(),
             Alerts = activeAlerts.Take(10).Select(a => DtoMapper.ToAlertDto(a)).ToList()
         };
 

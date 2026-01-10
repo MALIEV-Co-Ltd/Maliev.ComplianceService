@@ -4,6 +4,7 @@ using Maliev.ComplianceService.Application.Commands.ResolveAlert;
 using Maliev.ComplianceService.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 
@@ -11,7 +12,8 @@ namespace Maliev.ComplianceService.Api.Controllers;
 /// Controller for managing compliance alerts.
 /// </summary>
 [ApiController]
-[Route("alerts")]
+[ApiVersion("1.0")]
+[Route("compliance/v{version:apiVersion}/compliance-alerts")]
 public class AlertsController : ControllerBase
 {
     private readonly IMediator _mediator;

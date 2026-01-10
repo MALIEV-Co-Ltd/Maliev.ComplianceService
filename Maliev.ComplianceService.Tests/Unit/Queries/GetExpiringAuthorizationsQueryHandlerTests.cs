@@ -28,10 +28,10 @@ public class GetExpiringAuthorizationsQueryHandlerTests
         var query = new GetExpiringAuthorizationsQuery(days);
         var authorizations = new List<WorkAuthorization>
         {
-            new WorkAuthorization 
-            { 
-                Id = Guid.NewGuid(), 
-                EmployeeId = Guid.NewGuid(), 
+            new WorkAuthorization
+            {
+                Id = Guid.NewGuid(),
+                EmployeeId = Guid.NewGuid(),
                 DocumentNumber = "DOC1",
                 ExpirationDate = DateTime.UtcNow.AddDays(10),
                 ComplianceStatus = ComplianceStatus.ExpiringSoon

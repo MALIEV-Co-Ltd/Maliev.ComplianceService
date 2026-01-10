@@ -54,6 +54,16 @@ public interface IWorkAuthorizationRepository
     Task DeactivateWorkAuthorizationsAsync(Guid employeeId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets a dictionary of compliance status counts for reporting.
+    /// </summary>
+    Task<IDictionary<ComplianceStatus, int>> GetComplianceStatsAsync(Guid? departmentId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a breakdown of compliance status by authorization type.
+    /// </summary>
+    Task<IEnumerable<DTOs.AuthorizationTypeBreakdown>> GetTypeBreakdownAsync(Guid? departmentId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Saves changes to the database
     /// </summary>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

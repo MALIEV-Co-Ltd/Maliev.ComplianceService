@@ -24,7 +24,7 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="logger">The logger.</param>
     public WorkAuthorizationExpirationReminderService(
-        IServiceProvider serviceProvider, 
+        IServiceProvider serviceProvider,
         ILogger<WorkAuthorizationExpirationReminderService> logger)
     {
         _serviceProvider = serviceProvider;
@@ -63,24 +63,28 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
         foreach (var days in thresholds)
         {
             var authorizations = await repository.GetExpiringWithinDaysAsync(days, cancellationToken);
-            
+
             foreach (var auth in authorizations)
             {
                 if (!auth.ExpirationDate.HasValue) continue;
 
                 var remainingDays = (auth.ExpirationDate.Value.Date - DateTime.UtcNow.Date).Days;
-                if (remainingDays != days) continue;
 
-                // Check if alert already exists for this threshold
-                var alertType = AlertType.ExpirationWarning;
-                if (await alertRepository.HasUnresolvedAlertAsync(auth.Id, alertType, cancellationToken))
+                // Determine the highest threshold that has been crossed but not yet alerted for
+                int? currentThreshold = thresholds
+                    .OrderByDescending(t => t)
+                    .FirstOrDefault(t => remainingDays <= t);
+
+                if (currentThreshold == null) continue;
+
+                // Skip if we already alerted for this threshold or a lower (more critical) one
+                if (auth.LastExpirationAlertThreshold.HasValue && auth.LastExpirationAlertThreshold <= currentThreshold)
                 {
-                    // Optionally check message or metadata to avoid duplicates for SAME threshold
-                    // For now, let's assume we want to avoid multiple "ExpirationWarning" if one is already open
                     continue;
                 }
 
-                var severity = days switch
+                var alertType = AlertType.ExpirationWarning;
+                var severity = currentThreshold switch
                 {
                     30 => AlertSeverity.Critical,
                     60 => AlertSeverity.High,
@@ -93,11 +97,15 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
                     EmployeeId = auth.EmployeeId,
                     AlertType = alertType,
                     Severity = severity,
-                    Message = $"Work authorization {auth.AuthorizationType} expires in {days} days on {auth.ExpirationDate:yyyy-MM-dd}",
+                    Message = $"Work authorization {auth.AuthorizationType} expires in {remainingDays} days on {auth.ExpirationDate:yyyy-MM-dd}",
                     CreatedDate = DateTime.UtcNow
                 };
 
                 await alertRepository.CreateAsync(alert, cancellationToken);
+
+                // Track that we've alerted for this threshold
+                auth.LastExpirationAlertThreshold = currentThreshold;
+                await repository.UpdateAsync(auth, cancellationToken);
 
                 // Publish event
                 await publishEndpoint.Publish(new WorkAuthorizationExpiringEvent(
@@ -105,11 +113,11 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
                     auth.EmployeeId,
                     auth.AuthorizationType,
                     auth.ExpirationDate.Value,
-                    days,
+                    remainingDays,
                     DateTime.UtcNow
                 ), cancellationToken);
 
-                _logger.LogInformation("Generated {Days} day expiration alert for authorization {AuthId}", days, auth.Id);
+                _logger.LogInformation("Generated {Threshold} day expiration alert for authorization {AuthId}", currentThreshold, auth.Id);
             }
         }
     }

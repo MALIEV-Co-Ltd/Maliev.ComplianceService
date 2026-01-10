@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Maliev.ComplianceService.Infrastructure.Migrations
 {
     [DbContext(typeof(ComplianceDbContext))]
-    [Migration("20251229061917_InitialComplianceCreate")]
-    partial class InitialComplianceCreate
+    [Migration("20260110141718_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,6 +101,10 @@ namespace Maliev.ComplianceService.Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("AccessRevocationSentDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("access_revocation_sent_date");
+
                     b.Property<int>("AuthorizationType")
                         .HasColumnType("integer")
                         .HasColumnName("authorization_type");
@@ -143,6 +147,10 @@ namespace Maliev.ComplianceService.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("issuing_authority");
+
+                    b.Property<int?>("LastExpirationAlertThreshold")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_expiration_alert_threshold");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("timestamp with time zone")

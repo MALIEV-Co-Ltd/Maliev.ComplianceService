@@ -6,6 +6,7 @@ using Maliev.ComplianceService.Application.Queries.GetEmployeeWorkAuthorizations
 using Maliev.ComplianceService.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 
@@ -13,7 +14,8 @@ namespace Maliev.ComplianceService.Api.Controllers;
 /// Controller for managing employee work authorizations.
 /// </summary>
 [ApiController]
-[Route("work-authorization")]
+[ApiVersion("1.0")]
+[Route("compliance/v{version:apiVersion}/work-authorizations")]
 public class WorkAuthorizationController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -33,14 +35,14 @@ public class WorkAuthorizationController : ControllerBase
     /// <param name="employeeId">The employee unique identifier.</param>
     /// <param name="request">The work authorization details.</param>
     /// <returns>The created work authorization details.</returns>
-    [HttpPost("/employees/{employeeId}/work-authorization")]
+    [HttpPost("employees/{employeeId}")]
     public async Task<ActionResult<WorkAuthorizationResponse>> RecordWorkAuthorization(
-        Guid employeeId, 
+        Guid employeeId,
         [FromBody] RecordWorkAuthorizationRequest request)
     {
         var command = new RecordWorkAuthorizationCommand(employeeId, request);
         var result = await _mediator.Send(command);
-        
+
         return CreatedAtAction(nameof(GetWorkAuthorization), new { authId = result.Id }, result);
     }
 
@@ -49,7 +51,7 @@ public class WorkAuthorizationController : ControllerBase
     /// </summary>
     /// <param name="employeeId">The employee unique identifier.</param>
     /// <returns>A collection of work authorizations.</returns>
-    [HttpGet("/employees/{employeeId}/work-authorization")]
+    [HttpGet("employees/{employeeId}")]
     public async Task<ActionResult<IEnumerable<WorkAuthorizationResponse>>> GetEmployeeWorkAuthorizations(Guid employeeId)
     {
         var query = new GetEmployeeWorkAuthorizationsQuery(employeeId);
@@ -78,7 +80,7 @@ public class WorkAuthorizationController : ControllerBase
     /// <returns>The updated work authorization details.</returns>
     [HttpPut("{authId}")]
     public async Task<ActionResult<WorkAuthorizationResponse>> UpdateWorkAuthorization(
-        Guid authId, 
+        Guid authId,
         [FromBody] UpdateWorkAuthorizationRequest request)
     {
         var command = new UpdateWorkAuthorizationCommand(authId, request);
@@ -91,7 +93,7 @@ public class WorkAuthorizationController : ControllerBase
     /// </summary>
     /// <param name="daysUntilExpiration">The threshold in days for expiration (default 90).</param>
     /// <returns>A collection of expiring work authorizations.</returns>
-    [HttpGet("/work-authorization/expiring")]
+    [HttpGet("expiring")]
     public async Task<ActionResult<IEnumerable<ExpiringAuthorizationResponse>>> GetExpiringAuthorizations(
         [FromQuery] int daysUntilExpiration = 90)
     {
