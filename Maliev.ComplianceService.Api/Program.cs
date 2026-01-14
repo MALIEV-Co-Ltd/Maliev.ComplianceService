@@ -1,4 +1,3 @@
-#pragma warning disable CA1848 // For improved performance, use the LoggerMessage delegates
 using Maliev.Aspire.ServiceDefaults;
 using Maliev.ComplianceService.Infrastructure.Data;
 using Maliev.ComplianceService.Application.Interfaces;
@@ -18,7 +17,7 @@ var bootstrapLogger = loggerFactory.CreateLogger("Program");
 
 try
 {
-    bootstrapLogger.LogInformation("Starting Compliance Service host");
+    Log.StartingHost(bootstrapLogger, "Compliance Service");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -106,12 +105,12 @@ try
     app.MapDefaultEndpoints(servicePrefix: "compliance");
     app.MapApiDocumentation(servicePrefix: "compliance");
 
-    logger.LogInformation("Compliance Service started successfully");
+    Log.ServiceStarted(logger, "Compliance Service");
     await app.RunAsync();
 }
 catch (Exception ex)
 {
-    bootstrapLogger.LogCritical(ex, "Compliance Service host terminated unexpectedly during startup");
+    Log.HostTerminated(bootstrapLogger, ex, "Compliance Service");
     throw;
 }
 finally
@@ -122,4 +121,17 @@ finally
 /// <summary>
 /// Entry point for the Compliance Service API.
 /// </summary>
-public partial class Program { }
+public partial class Program
+{
+    internal static partial class Log
+    {
+        [LoggerMessage(Level = LogLevel.Information, Message = "Starting {ServiceName} host")]
+        public static partial void StartingHost(ILogger logger, string serviceName);
+
+        [LoggerMessage(Level = LogLevel.Critical, Message = "{ServiceName} host terminated unexpectedly during startup")]
+        public static partial void HostTerminated(ILogger logger, Exception ex, string serviceName);
+
+        [LoggerMessage(Level = LogLevel.Information, Message = "{ServiceName} started successfully")]
+        public static partial void ServiceStarted(ILogger logger, string serviceName);
+    }
+}
