@@ -17,7 +17,7 @@ var bootstrapLogger = loggerFactory.CreateLogger("Program");
 
 try
 {
-    Log.StartingHost(bootstrapLogger, "Compliance Service");
+    Program.Log.StartingHost(bootstrapLogger, "Compliance Service");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -105,12 +105,12 @@ try
     app.MapDefaultEndpoints(servicePrefix: "compliance");
     app.MapApiDocumentation(servicePrefix: "compliance");
 
-    Log.ServiceStarted(logger, "Compliance Service");
+    Program.Log.ServiceStarted(logger, "Compliance Service");
     await app.RunAsync();
 }
 catch (Exception ex)
 {
-    Log.HostTerminated(bootstrapLogger, ex, "Compliance Service");
+    Program.Log.HostTerminated(bootstrapLogger, ex, "Compliance Service");
     throw;
 }
 finally
