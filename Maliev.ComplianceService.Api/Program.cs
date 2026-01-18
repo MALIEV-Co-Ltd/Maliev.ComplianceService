@@ -83,7 +83,10 @@ try
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
     // --- Database Migrations ---
-    await app.MigrateDatabaseAsync<ComplianceDbContext>();
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        await app.MigrateDatabaseAsync<ComplianceDbContext>();
+    }
 
     // --- Middleware Pipeline ---
     app.UseStandardMiddleware();
