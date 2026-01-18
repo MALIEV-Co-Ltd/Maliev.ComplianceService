@@ -38,6 +38,9 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            // Wait for application to be fully started and database to be migrated
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
             try
             {
                 await ProcessExpirationsAsync(stoppingToken);
