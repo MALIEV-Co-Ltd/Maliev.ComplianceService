@@ -51,7 +51,8 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
         }
     }
 
-    private async Task ProcessExpiredAsync(CancellationToken cancellationToken)
+    internal async Task ProcessExpiredAsync(CancellationToken cancellationToken)
+
     {
         using var scope = _serviceProvider.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IWorkAuthorizationRepository>();

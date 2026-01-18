@@ -1,15 +1,12 @@
-using Maliev.Aspire.ServiceDefaults;
-using Maliev.ComplianceService.Infrastructure.Data;
-using Maliev.ComplianceService.Application.Interfaces;
-using Maliev.ComplianceService.Infrastructure.Repositories;
 using Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
-using Maliev.ComplianceService.Infrastructure.Services;
+using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Infrastructure.BackgroundServices;
 using Maliev.ComplianceService.Infrastructure.Consumers;
+using Maliev.ComplianceService.Infrastructure.Data;
 using Maliev.ComplianceService.Infrastructure.IAM;
-using MassTransit;
+using Maliev.ComplianceService.Infrastructure.Repositories;
+using Maliev.ComplianceService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 // Initialize bootstrap logging
 using var loggerFactory = LoggerFactory.Create(logBuilder => logBuilder.AddConsole());

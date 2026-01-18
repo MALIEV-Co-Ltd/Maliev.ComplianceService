@@ -1,6 +1,6 @@
+using Maliev.ComplianceService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Maliev.ComplianceService.Domain.Entities;
 
 namespace Maliev.ComplianceService.Infrastructure.Data.Configurations;
 

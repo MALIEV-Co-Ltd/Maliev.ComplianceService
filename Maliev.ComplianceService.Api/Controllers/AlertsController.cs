@@ -1,10 +1,10 @@
+using Asp.Versioning;
+using Maliev.ComplianceService.Application.Commands.ResolveAlert;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Queries.GetAlerts;
-using Maliev.ComplianceService.Application.Commands.ResolveAlert;
 using Maliev.ComplianceService.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 

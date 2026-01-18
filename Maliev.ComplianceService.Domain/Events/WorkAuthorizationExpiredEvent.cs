@@ -1,5 +1,3 @@
-using Maliev.ComplianceService.Domain.Enums;
-
 namespace Maliev.ComplianceService.Domain.Events;
 
 /// <summary>

@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using Maliev.ComplianceService.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Maliev.ComplianceService.Domain.Entities;
 
