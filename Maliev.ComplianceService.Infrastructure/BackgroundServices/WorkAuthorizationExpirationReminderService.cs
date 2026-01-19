@@ -38,6 +38,9 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            // Wait for application to be fully started and database to be migrated
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
             try
             {
                 await ProcessExpirationsAsync(stoppingToken);
@@ -52,7 +55,8 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
         }
     }
 
-    private async Task ProcessExpirationsAsync(CancellationToken cancellationToken)
+    internal async Task ProcessExpirationsAsync(CancellationToken cancellationToken)
+
     {
         using var scope = _serviceProvider.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IWorkAuthorizationRepository>();
@@ -70,10 +74,11 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
 
                 var remainingDays = (auth.ExpirationDate.Value.Date - DateTime.UtcNow.Date).Days;
 
-                // Determine the highest threshold that has been crossed but not yet alerted for
+                // Determine the lowest threshold that has been crossed but not yet alerted for
                 int? currentThreshold = thresholds
-                    .OrderByDescending(t => t)
+                    .OrderBy(t => t)
                     .FirstOrDefault(t => remainingDays <= t);
+
 
                 if (currentThreshold == null) continue;
 

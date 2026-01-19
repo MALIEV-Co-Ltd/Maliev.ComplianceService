@@ -1,8 +1,8 @@
+using Asp.Versioning;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Queries.GetComplianceReport;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 

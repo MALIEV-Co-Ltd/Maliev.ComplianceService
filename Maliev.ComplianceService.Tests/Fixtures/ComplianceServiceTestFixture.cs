@@ -46,10 +46,12 @@ public class ComplianceServiceTestFixture : WebApplicationFactory<Program>, IAsy
     {
         await Task.WhenAll(_postgreSqlContainer.StartAsync(), _redisContainer.StartAsync());
 
+        // Ensure database is created and migrated for tests
         using var scope = Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComplianceDbContext>();
         await context.Database.MigrateAsync();
     }
+
 
     public new async Task DisposeAsync()
     {

@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Application.DTOs;
+using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
 using Maliev.ComplianceService.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Maliev.ComplianceService.Infrastructure.Repositories;
 

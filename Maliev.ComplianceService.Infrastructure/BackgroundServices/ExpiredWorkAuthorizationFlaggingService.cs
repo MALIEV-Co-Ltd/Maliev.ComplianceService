@@ -38,6 +38,9 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            // Wait for application to be fully started and database to be migrated
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
             try
             {
                 await ProcessExpiredAsync(stoppingToken);
@@ -51,7 +54,8 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
         }
     }
 
-    private async Task ProcessExpiredAsync(CancellationToken cancellationToken)
+    internal async Task ProcessExpiredAsync(CancellationToken cancellationToken)
+
     {
         using var scope = _serviceProvider.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IWorkAuthorizationRepository>();

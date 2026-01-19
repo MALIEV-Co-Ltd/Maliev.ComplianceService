@@ -1,10 +1,10 @@
-using System.Text.Json;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Application.Mappers;
 using Maliev.ComplianceService.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace Maliev.ComplianceService.Application.Queries.GetComplianceReport;
 

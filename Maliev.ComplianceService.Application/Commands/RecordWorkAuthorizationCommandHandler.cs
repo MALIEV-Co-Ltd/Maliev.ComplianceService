@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Application.Mappers;
@@ -6,6 +5,7 @@ using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
 using MassTransit;
 using MediatR;
+using System.ComponentModel.DataAnnotations;
 
 namespace Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
 

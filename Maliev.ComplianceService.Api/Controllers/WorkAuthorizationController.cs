@@ -1,12 +1,12 @@
+using Asp.Versioning;
 using Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
 using Maliev.ComplianceService.Application.Commands.UpdateWorkAuthorization;
+using Maliev.ComplianceService.Application.DTOs;
+using Maliev.ComplianceService.Application.Queries.GetEmployeeWorkAuthorizations;
 using Maliev.ComplianceService.Application.Queries.GetExpiringAuthorizations;
 using Maliev.ComplianceService.Application.Queries.GetWorkAuthorization;
-using Maliev.ComplianceService.Application.Queries.GetEmployeeWorkAuthorizations;
-using Maliev.ComplianceService.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 
