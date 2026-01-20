@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Maliev.ComplianceService.Api/Maliev.ComplianceService.Api.csproj" />
+  <Project Path="Maliev.ComplianceService.Application/Maliev.ComplianceService.Application.csproj" />
+  <Project Path="Maliev.ComplianceService.Domain/Maliev.ComplianceService.Domain.csproj" />
+  <Project Path="Maliev.ComplianceService.Infrastructure/Maliev.ComplianceService.Infrastructure.csproj" />
+  <Project Path="Maliev.ComplianceService.Tests/Maliev.ComplianceService.Tests.csproj" />
+</Solution>
