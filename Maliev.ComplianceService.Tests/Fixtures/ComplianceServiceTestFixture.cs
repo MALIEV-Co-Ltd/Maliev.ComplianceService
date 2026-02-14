@@ -13,12 +13,10 @@ namespace Maliev.ComplianceService.Tests.Fixtures;
 
 public class ComplianceServiceTestFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:18-alpine")
+    private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder().WithName("postgres:18-alpine")
         .Build();
 
-    private readonly RedisContainer _redisContainer = new RedisBuilder()
-        .WithImage("redis:7-alpine")
+    private readonly RedisContainer _redisContainer = new RedisBuilder().WithName("redis:7-alpine")
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

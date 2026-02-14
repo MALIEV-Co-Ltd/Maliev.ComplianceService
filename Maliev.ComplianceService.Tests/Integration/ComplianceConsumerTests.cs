@@ -42,6 +42,8 @@ public class ComplianceConsumerTests : IClassFixture<ComplianceServiceTestFixtur
                 EmployeeId: Guid.NewGuid(),
                 EmployeeNumber: "EMP-001",
                 PrincipalId: Guid.NewGuid(),
+                Email: "test@example.com",
+                FullName: "Test Employee",
                 StartDate: DateTimeOffset.UtcNow,
                 DepartmentId: Guid.NewGuid(),
                 PositionId: null,
