@@ -33,7 +33,7 @@ try
     builder.AddPostgresDbContext<ComplianceDbContext>(connectionName: "ComplianceDbContext");
 
     // Redis
-    builder.AddRedisDistributedCache(instanceName: "compliance:");
+    builder.AddStandardCache("compliance:"); // Redis + in-memory fallback, memory-optimized
 
     // MassTransit
     builder.AddMassTransitWithRabbitMq(x =>
@@ -51,7 +51,7 @@ try
     builder.Services.AddIAMRegistration<ComplianceIAMRegistrationService>("compliance");
 
     // --- API Configuration ---
-    builder.AddDefaultCors();
+    builder.AddStandardCors(); // CORS with fail-fast validation
     builder.AddDefaultApiVersioning();
     builder.AddStandardRateLimiting();
 

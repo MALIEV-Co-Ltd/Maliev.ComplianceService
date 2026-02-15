@@ -42,9 +42,7 @@ public class ComplianceBackgroundServiceTests : IClassFixture<ComplianceServiceT
         context.WorkAuthorizations.Add(expiredAuth);
         await context.SaveChangesAsync();
 
-        var flaggingService = _fixture.Services.GetServices<IHostedService>()
-            .OfType<ExpiredWorkAuthorizationFlaggingService>()
-            .Single();
+        var flaggingService = _fixture.Services.GetRequiredService<ExpiredWorkAuthorizationFlaggingService>();
 
         // Act
         await flaggingService.ProcessExpiredAsync(default);
@@ -79,9 +77,7 @@ public class ComplianceBackgroundServiceTests : IClassFixture<ComplianceServiceT
         context.WorkAuthorizations.Add(expiringAuth);
         await context.SaveChangesAsync();
 
-        var reminderService = _fixture.Services.GetServices<IHostedService>()
-            .OfType<WorkAuthorizationExpirationReminderService>()
-            .Single();
+        var reminderService = _fixture.Services.GetRequiredService<WorkAuthorizationExpirationReminderService>();
 
         // Act
         await reminderService.ProcessExpirationsAsync(default);
