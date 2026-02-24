@@ -1,7 +1,8 @@
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
-using Maliev.ComplianceService.Domain.Events;
+using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts.Contracts.Compliance;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -114,12 +115,23 @@ public class WorkAuthorizationExpirationReminderService : BackgroundService
 
                 // Publish event
                 await publishEndpoint.Publish(new WorkAuthorizationExpiringEvent(
-                    auth.Id,
-                    auth.EmployeeId,
-                    auth.AuthorizationType,
-                    auth.ExpirationDate.Value,
-                    remainingDays,
-                    DateTime.UtcNow
+                    MessageId: Guid.NewGuid(),
+                    MessageName: nameof(WorkAuthorizationExpiringEvent),
+                    MessageType: MessageType.Event,
+                    MessageVersion: "1.0.0",
+                    PublishedBy: "ComplianceService",
+                    ConsumedBy: Array.Empty<string>(),
+                    CorrelationId: Guid.NewGuid(),
+                    CausationId: null,
+                    OccurredAtUtc: DateTimeOffset.UtcNow,
+                    IsPublic: false,
+                    Payload: new WorkAuthorizationExpiringEventPayload(
+                        AuthorizationId: auth.Id,
+                        EmployeeId: auth.EmployeeId,
+                        AuthorizationType: auth.AuthorizationType.ToString(),
+                        ExpirationDate: new DateTimeOffset(auth.ExpirationDate.Value, TimeSpan.Zero),
+                        DaysUntilExpiration: remainingDays
+                    )
                 ), cancellationToken);
 
                 _logger.LogInformation("Generated {Threshold} day expiration alert for authorization {AuthId}", currentThreshold, auth.Id);

@@ -1,7 +1,9 @@
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
-using Maliev.ComplianceService.Domain.Events;
+using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts.Contracts.Compliance;
+using Maliev.MessagingContracts.Contracts.Lifecycle;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -93,23 +95,43 @@ public class ExpiredWorkAuthorizationFlaggingService : BackgroundService
 
             var expiredDays = (DateTime.UtcNow.Date - auth.ExpirationDate.Value.Date).Days;
             await publishEndpoint.Publish(new WorkAuthorizationExpiredEvent(
-                auth.Id,
-                auth.EmployeeId,
-                auth.AuthorizationType.ToString(),
-                auth.ExpirationDate.Value,
-                expiredDays,
-                DateTime.UtcNow), cancellationToken);
+                MessageId: Guid.NewGuid(),
+                MessageName: nameof(WorkAuthorizationExpiredEvent),
+                MessageType: MessageType.Event,
+                MessageVersion: "1.0.0",
+                PublishedBy: "ComplianceService",
+                ConsumedBy: Array.Empty<string>(),
+                CorrelationId: Guid.NewGuid(),
+                CausationId: null,
+                OccurredAtUtc: DateTimeOffset.UtcNow,
+                IsPublic: false,
+                Payload: new WorkAuthorizationExpiredEventPayload(
+                    AuthorizationId: auth.Id,
+                    EmployeeId: auth.EmployeeId,
+                    AuthorizationType: auth.AuthorizationType.ToString(),
+                    ExpirationDate: new DateTimeOffset(auth.ExpirationDate.Value, TimeSpan.Zero)
+                )
+            ), cancellationToken);
 
             // FR-018: AccessRevocationRequiredEvent after 30 days
             if (expiredDays >= 30 && !auth.AccessRevocationSentDate.HasValue)
             {
                 await publishEndpoint.Publish(new AccessRevocationRequiredEvent(
-                    auth.EmployeeId,
-                    DateTime.UtcNow,
-                    "Work authorization expired for more than 30 days",
-                    auth.Id,
-                    expiredDays,
-                    DateTime.UtcNow
+                    MessageId: Guid.NewGuid(),
+                    MessageName: nameof(AccessRevocationRequiredEvent),
+                    MessageType: MessageType.Event,
+                    MessageVersion: "1.0.0",
+                    PublishedBy: "ComplianceService",
+                    ConsumedBy: Array.Empty<string>(),
+                    CorrelationId: Guid.NewGuid(),
+                    CausationId: null,
+                    OccurredAtUtc: DateTimeOffset.UtcNow,
+                    IsPublic: false,
+                    Payload: new AccessRevocationRequiredEventPayload(
+                        EmployeeId: auth.EmployeeId,
+                        EffectiveDate: DateTimeOffset.UtcNow,
+                        Reason: "Work authorization expired for more than 30 days"
+                    )
                 ), cancellationToken);
 
                 auth.AccessRevocationSentDate = DateTime.UtcNow;

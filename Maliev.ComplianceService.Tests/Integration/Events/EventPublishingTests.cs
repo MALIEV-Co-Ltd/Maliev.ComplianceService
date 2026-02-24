@@ -1,4 +1,5 @@
-using Maliev.ComplianceService.Domain.Events;
+using Maliev.MessagingContracts.Contracts.Compliance;
+using Maliev.MessagingContracts.Generated;
 using Maliev.ComplianceService.Tests.Fixtures;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,12 +25,23 @@ public class EventPublishingTests : IClassFixture<ComplianceServiceTestFixture>
 
         // Act
         await harness.Bus.Publish(new WorkAuthorizationExpiringEvent(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            Maliev.ComplianceService.Domain.Enums.AuthorizationType.WorkVisa,
-            DateTime.UtcNow.AddDays(30),
-            30,
-            DateTime.UtcNow
+            MessageId: Guid.NewGuid(),
+            MessageName: nameof(WorkAuthorizationExpiringEvent),
+            MessageType: MessageType.Event,
+            MessageVersion: "1.0.0",
+            PublishedBy: "Test",
+            ConsumedBy: Array.Empty<string>(),
+            CorrelationId: Guid.NewGuid(),
+            CausationId: null,
+            OccurredAtUtc: DateTimeOffset.UtcNow,
+            IsPublic: false,
+            Payload: new WorkAuthorizationExpiringEventPayload(
+                AuthorizationId: Guid.NewGuid(),
+                EmployeeId: Guid.NewGuid(),
+                AuthorizationType: "WorkVisa",
+                ExpirationDate: DateTimeOffset.UtcNow.AddDays(30),
+                DaysUntilExpiration: 30
+            )
         ));
 
         // Assert

@@ -3,6 +3,8 @@ using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Application.Mappers;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
+using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts.Contracts.Compliance;
 using MassTransit;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -67,10 +69,10 @@ public class RecordWorkAuthorizationCommandHandler : IRequestHandler<RecordWorkA
 
         if (created.RightToWorkDocumentId.HasValue)
         {
-            await _publishEndpoint.Publish(new Maliev.MessagingContracts.Generated.ComplianceDocumentUploadedEvent(
+            await _publishEndpoint.Publish(new ComplianceDocumentUploadedEvent(
                 MessageId: Guid.NewGuid(),
-                MessageName: nameof(Maliev.MessagingContracts.Generated.ComplianceDocumentUploadedEvent),
-                MessageType: Maliev.MessagingContracts.Generated.MessageType.Event,
+                MessageName: nameof(ComplianceDocumentUploadedEvent),
+                MessageType: MessageType.Event,
                 MessageVersion: "1.0",
                 PublishedBy: "ComplianceService",
                 ConsumedBy: Array.Empty<string>(),
@@ -78,11 +80,11 @@ public class RecordWorkAuthorizationCommandHandler : IRequestHandler<RecordWorkA
                 CausationId: null,
                 OccurredAtUtc: DateTimeOffset.UtcNow,
                 IsPublic: false,
-                Payload: new Maliev.MessagingContracts.Generated.ComplianceDocumentUploadedEventPayload(
+                Payload: new ComplianceDocumentUploadedEventPayload(
                     DocumentId: created.RightToWorkDocumentId.Value,
                     EmployeeId: created.EmployeeId,
                     DocumentType: created.AuthorizationType.ToString(),
-                    UploadDate: DateTime.UtcNow
+                    UploadDate: DateTimeOffset.UtcNow
                 )
             ), cancellationToken);
         }

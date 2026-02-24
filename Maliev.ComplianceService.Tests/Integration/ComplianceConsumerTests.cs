@@ -2,6 +2,8 @@ using Moq;
 using Xunit;
 using Microsoft.Extensions.DependencyInjection;
 using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts.Contracts.Employee;
+using Maliev.MessagingContracts.Contracts.Career;
 using Maliev.ComplianceService.Infrastructure.Consumers;
 using MassTransit;
 using Maliev.ComplianceService.Tests.Fixtures;

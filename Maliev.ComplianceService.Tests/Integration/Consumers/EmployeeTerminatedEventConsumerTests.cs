@@ -2,6 +2,7 @@ using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
 using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts.Contracts.Employee;
 using Maliev.ComplianceService.Infrastructure.Consumers;
 using Maliev.ComplianceService.Tests.Fixtures;
 using MassTransit;

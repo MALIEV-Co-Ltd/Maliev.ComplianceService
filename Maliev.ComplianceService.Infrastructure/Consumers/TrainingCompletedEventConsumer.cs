@@ -1,4 +1,4 @@
-using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts.Contracts.Career;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
