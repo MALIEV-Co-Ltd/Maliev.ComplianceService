@@ -1,5 +1,5 @@
 using Maliev.MessagingContracts.Contracts.Compliance;
-using Maliev.MessagingContracts.Generated;
+using Maliev.MessagingContracts;
 using Maliev.ComplianceService.Tests.Fixtures;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
