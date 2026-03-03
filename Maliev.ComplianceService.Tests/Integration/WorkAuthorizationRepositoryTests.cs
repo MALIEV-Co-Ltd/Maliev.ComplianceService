@@ -181,12 +181,13 @@ public class WorkAuthorizationRepositoryTests : IClassFixture<ComplianceServiceT
         };
         var created = await repository.AddAsync(entity);
 
-        created.ExpirationDate = DateTime.UtcNow.AddDays(200);
+        var newExpirationDate = DateTime.UtcNow.AddDays(200);
+        created.ExpirationDate = newExpirationDate;
         created.ComplianceStatus = ComplianceStatus.ExpiringSoon;
 
         var updated = await repository.UpdateAsync(created);
 
-        Assert.Equal(DateTime.UtcNow.AddDays(200).Date, updated.ExpirationDate?.Date);
+        Assert.Equal(newExpirationDate.Date, updated.ExpirationDate?.Date);
     }
 
     [Fact]
