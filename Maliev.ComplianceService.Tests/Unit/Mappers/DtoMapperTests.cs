@@ -24,7 +24,7 @@ public class DtoMapperTests
             ComplianceStatus = ComplianceStatus.Compliant,
             CreatedDate = DateTime.UtcNow.AddDays(-30),
             ModifiedDate = DateTime.UtcNow,
-            RowVersion = Guid.NewGuid()
+            RowVersion = new byte[] { 1 }
         };
 
         var result = DtoMapper.ToDto(entity, "Test Employee");
@@ -87,7 +87,7 @@ public class DtoMapperTests
             ComplianceStatus = ComplianceStatus.ExpiringSoon,
             CreatedDate = DateTime.UtcNow.AddDays(-30),
             ModifiedDate = DateTime.UtcNow,
-            RowVersion = Guid.NewGuid()
+            RowVersion = new byte[] { 1 }
         };
 
         var result = DtoMapper.ToExpiringDto(entity, "Expiring Employee");

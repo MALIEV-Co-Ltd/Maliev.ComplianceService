@@ -25,7 +25,7 @@ public class ComplianceBackgroundServiceTests : IClassFixture<ComplianceServiceT
         // Arrange
         using var scope = _fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComplianceDbContext>();
-        
+
         await context.ComplianceAlerts.ExecuteDeleteAsync();
         await context.WorkAuthorizations.ExecuteDeleteAsync();
 
@@ -60,7 +60,7 @@ public class ComplianceBackgroundServiceTests : IClassFixture<ComplianceServiceT
         // Arrange
         using var scope = _fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ComplianceDbContext>();
-        
+
         await context.ComplianceAlerts.ExecuteDeleteAsync();
         await context.WorkAuthorizations.ExecuteDeleteAsync();
 
@@ -85,12 +85,12 @@ public class ComplianceBackgroundServiceTests : IClassFixture<ComplianceServiceT
         // Assert
         using var assertScope = _fixture.Services.CreateScope();
         var assertContext = assertScope.ServiceProvider.GetRequiredService<ComplianceDbContext>();
-        
+
         var alert = await assertContext.ComplianceAlerts.FirstOrDefaultAsync(a => a.WorkAuthorizationId == expiringAuth.Id);
         Assert.NotNull(alert);
         Assert.Equal(AlertType.ExpirationWarning, alert.AlertType);
         Assert.Equal(AlertSeverity.Critical, alert.Severity);
-        
+
         var updatedAuth = await assertContext.WorkAuthorizations.FindAsync(expiringAuth.Id);
         Assert.Equal(30, updatedAuth!.LastExpirationAlertThreshold);
     }

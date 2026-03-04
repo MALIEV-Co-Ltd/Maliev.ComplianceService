@@ -47,5 +47,5 @@ public record WorkAuthorizationResponse
     public DateTime? ModifiedDate { get; init; }
 
     /// <summary> Concurrency token. </summary>
-    public Guid RowVersion { get; init; }
+    public byte[] RowVersion { get; init; } = null!;
 }

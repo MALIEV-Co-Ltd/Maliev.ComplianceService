@@ -31,7 +31,7 @@ namespace Maliev.ComplianceService.Infrastructure.Migrations
                     compliance_status = table.Column<int>(type: "integer", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
                     modified_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    row_version = table.Column<Guid>(type: "uuid", nullable: false)
+                    row_version = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {

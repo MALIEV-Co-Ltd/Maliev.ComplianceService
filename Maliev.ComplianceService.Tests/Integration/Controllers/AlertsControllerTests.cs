@@ -98,7 +98,7 @@ public class AlertsControllerTests : IClassFixture<ComplianceServiceTestFixture>
 
         using var scope = _fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<Maliev.ComplianceService.Infrastructure.Data.ComplianceDbContext>();
-        
+
         var alert = new Maliev.ComplianceService.Domain.Entities.ComplianceAlert
         {
             WorkAuthorizationId = auth!.Id,
@@ -139,7 +139,7 @@ public class AlertsControllerTests : IClassFixture<ComplianceServiceTestFixture>
 
         using var scope = _fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<Maliev.ComplianceService.Infrastructure.Data.ComplianceDbContext>();
-        
+
         var alert = new Maliev.ComplianceService.Domain.Entities.ComplianceAlert
         {
             WorkAuthorizationId = auth!.Id,

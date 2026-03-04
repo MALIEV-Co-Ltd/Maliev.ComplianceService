@@ -91,6 +91,7 @@ public class WorkAuthorizationConfiguration : IEntityTypeConfiguration<WorkAutho
 
         builder.Property(w => w.RowVersion)
             .HasColumnName("row_version")
+            .HasColumnType("bytea")
             .IsRowVersion();
 
         // Indexes

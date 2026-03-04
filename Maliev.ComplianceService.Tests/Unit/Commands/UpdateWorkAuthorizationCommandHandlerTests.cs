@@ -25,7 +25,7 @@ public class UpdateWorkAuthorizationCommandHandlerTests
     {
         // Arrange
         var authId = Guid.NewGuid();
-        var rowVersion = Guid.NewGuid();
+        var rowVersion = new byte[] { 1 };
         var existingAuth = new WorkAuthorization { Id = authId, RowVersion = rowVersion };
         var request = new UpdateWorkAuthorizationRequest
         {
@@ -54,10 +54,10 @@ public class UpdateWorkAuthorizationCommandHandlerTests
     {
         // Arrange
         var authId = Guid.NewGuid();
-        var existingAuth = new WorkAuthorization { Id = authId, RowVersion = Guid.NewGuid() };
+        var existingAuth = new WorkAuthorization { Id = authId, RowVersion = new byte[] { 1 } };
         var request = new UpdateWorkAuthorizationRequest
         {
-            RowVersion = Guid.NewGuid() // Different RowVersion
+            RowVersion = new byte[] { 2 } // Different RowVersion
         };
         var command = new UpdateWorkAuthorizationCommand(authId, request);
 

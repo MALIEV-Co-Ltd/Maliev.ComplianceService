@@ -8,13 +8,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Maliev.ComplianceService.Infrastructure.Migrations;
-
-[DbContext(typeof(ComplianceDbContext))]
-partial class ComplianceDbContextModelSnapshot : ModelSnapshot
+namespace Maliev.ComplianceService.Infrastructure.Migrations
 {
-    protected override void BuildModel(ModelBuilder modelBuilder)
+    [DbContext(typeof(ComplianceDbContext))]
+    partial class ComplianceDbContextModelSnapshot : ModelSnapshot
     {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.3")
@@ -161,8 +161,10 @@ partial class ComplianceDbContextModelSnapshot : ModelSnapshot
                         .HasColumnType("uuid")
                         .HasColumnName("right_to_work_document_id");
 
-                    b.Property<Guid>("RowVersion")
-                        .HasColumnType("uuid")
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
                         .HasColumnName("row_version");
 
                     b.Property<int?>("SponsorshipStatus")
@@ -210,3 +212,4 @@ partial class ComplianceDbContextModelSnapshot : ModelSnapshot
 #pragma warning restore 612, 618
         }
     }
+}

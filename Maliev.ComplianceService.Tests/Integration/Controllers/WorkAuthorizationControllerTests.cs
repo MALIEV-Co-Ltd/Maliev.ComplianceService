@@ -192,7 +192,7 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
         var authId = Guid.NewGuid();
         var request = new UpdateWorkAuthorizationRequest
         {
-            RowVersion = Guid.NewGuid()
+            RowVersion = new byte[] { 1 }
         };
 
         // Act
@@ -218,7 +218,7 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
 
         var updateRequest = new UpdateWorkAuthorizationRequest
         {
-            RowVersion = Guid.NewGuid() // Different version
+            RowVersion = new byte[] { 99, 99 } // Different version
         };
 
         // Act
