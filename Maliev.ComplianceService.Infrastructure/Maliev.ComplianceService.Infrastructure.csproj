@@ -9,6 +9,7 @@
     <SharedLibraryVersion Condition="'$(SharedLibraryVersion)' == ''">1.0.*-*</SharedLibraryVersion>
   </PropertyGroup>
 
+  <!-- Allows test project to access internal methods in background services (ProcessExpiredAsync, ProcessExpirationsAsync) for integration testing -->
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Maliev.ComplianceService.Tests</_Parameter1>
