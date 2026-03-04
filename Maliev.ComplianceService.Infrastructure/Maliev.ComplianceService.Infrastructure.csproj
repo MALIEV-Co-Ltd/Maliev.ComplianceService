@@ -8,6 +8,12 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SharedLibraryVersion Condition="'$(SharedLibraryVersion)' == ''">1.0.*-*</SharedLibraryVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Maliev.ComplianceService.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
   
   <ItemGroup Condition="'$(GITHUB_ACTIONS)' != 'true'">
     <ProjectReference Include="..\..\Maliev.Aspire\Maliev.Aspire.ServiceDefaults\Maliev.Aspire.ServiceDefaults.csproj" />

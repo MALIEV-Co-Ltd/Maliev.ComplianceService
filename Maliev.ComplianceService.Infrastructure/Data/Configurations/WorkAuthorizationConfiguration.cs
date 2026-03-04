@@ -91,7 +91,7 @@ public class WorkAuthorizationConfiguration : IEntityTypeConfiguration<WorkAutho
 
         builder.Property(w => w.RowVersion)
             .HasColumnName("row_version")
-            .IsRequired();
+            .IsRowVersion();
 
         // Indexes
         builder.HasIndex(w => w.EmployeeId)
