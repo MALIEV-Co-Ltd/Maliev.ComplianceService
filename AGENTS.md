@@ -31,7 +31,7 @@ The solution uses **xUnit** for testing.
 - **CQRS:** Use **MediatR** for Commands and Queries.
   - **Commands:** Mutate state. Return `Unit` or created resource DTO.
   - **Queries:** Read-only. Return DTOs.
-- **Validation:** Use Data Annotations on Entities. Check for FluentValidation validators in Application layer.
+- **Validation:** Use Data Annotations on Entities. Manual validation in Application layer.
 
 ### Syntax & Features
 - **Target Framework:** .NET 10

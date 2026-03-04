@@ -19,5 +19,5 @@ public record UpdateWorkAuthorizationRequest
 
     /// <summary> Current row version for optimistic locking. </summary>
     [Required]
-    public Guid RowVersion { get; init; }
+    public byte[] RowVersion { get; init; } = null!;
 }

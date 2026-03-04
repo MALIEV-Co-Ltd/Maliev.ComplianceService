@@ -100,7 +100,7 @@ public class WorkAuthorization
     /// <summary>
     /// Optimistic concurrency token
     /// </summary>
-    public Guid RowVersion { get; set; } = Guid.NewGuid();
+    public byte[]? RowVersion { get; set; }
 
     /// <summary>
     /// Navigation property for compliance alerts related to this authorization

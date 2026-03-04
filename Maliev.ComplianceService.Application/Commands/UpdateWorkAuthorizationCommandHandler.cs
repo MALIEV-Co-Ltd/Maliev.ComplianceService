@@ -38,7 +38,7 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
         }
 
         // Optimistic locking check
-        if (auth.RowVersion != command.Request.RowVersion)
+        if (!auth.RowVersion.SequenceEqual(command.Request.RowVersion))
         {
             throw new DbUpdateConcurrencyException("CONCURRENT_MODIFICATION");
         }
@@ -61,7 +61,6 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
         }
 
         auth.ModifiedDate = DateTime.UtcNow;
-        auth.RowVersion = Guid.NewGuid();
 
         var updated = await _repository.UpdateAsync(auth, cancellationToken);
 
