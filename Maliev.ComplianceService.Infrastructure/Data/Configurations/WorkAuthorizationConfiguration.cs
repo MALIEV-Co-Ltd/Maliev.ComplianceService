@@ -89,10 +89,11 @@ public class WorkAuthorizationConfiguration : IEntityTypeConfiguration<WorkAutho
             .HasColumnName("modified_date")
             .HasColumnType("timestamp with time zone");
 
-        builder.Property(w => w.RowVersion)
-            .HasColumnName("row_version")
-            .HasColumnType("bytea")
-            .IsRowVersion();
+        builder.Property(w => w.Xmin)
+            .HasColumnName("xmin")
+            .HasColumnType("xid")
+            .IsConcurrencyToken()
+            .ValueGeneratedOnAddOrUpdate();
 
         // Indexes
         builder.HasIndex(w => w.EmployeeId)

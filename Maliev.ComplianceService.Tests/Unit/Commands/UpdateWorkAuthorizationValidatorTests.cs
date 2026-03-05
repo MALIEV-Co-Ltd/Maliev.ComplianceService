@@ -20,8 +20,7 @@ public class UpdateWorkAuthorizationValidatorTests
         var request = new UpdateWorkAuthorizationRequest
         {
             ExpirationDate = DateTime.UtcNow.AddDays(365),
-            Notes = "Updated notes",
-            RowVersion = new byte[] { 1 }
+            Notes = "Updated notes"
         };
         var command = new UpdateWorkAuthorizationCommand(Guid.NewGuid(), request);
 
@@ -35,8 +34,7 @@ public class UpdateWorkAuthorizationValidatorTests
     {
         var request = new UpdateWorkAuthorizationRequest
         {
-            ExpirationDate = null,
-            RowVersion = new byte[] { 1 }
+            ExpirationDate = null
         };
         var command = new UpdateWorkAuthorizationCommand(Guid.NewGuid(), request);
 

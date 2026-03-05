@@ -3,7 +3,6 @@ using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Domain.Entities;
 using Maliev.ComplianceService.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -25,12 +24,11 @@ public class UpdateWorkAuthorizationCommandHandlerTests
     {
         // Arrange
         var authId = Guid.NewGuid();
-        var rowVersion = new byte[] { 1 };
-        var existingAuth = new WorkAuthorization { Id = authId, RowVersion = rowVersion };
+        var existingAuth = new WorkAuthorization { Id = authId, Xmin = 100 };
         var request = new UpdateWorkAuthorizationRequest
         {
             ExpirationDate = DateTime.UtcNow.AddDays(200),
-            RowVersion = rowVersion
+            Xmin = 100
         };
         var command = new UpdateWorkAuthorizationCommand(authId, request);
 
@@ -50,14 +48,30 @@ public class UpdateWorkAuthorizationCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ConcurrentModification_ThrowsException()
+    public async Task Handle_AuthorizationNotFound_ThrowsKeyNotFoundException()
     {
         // Arrange
         var authId = Guid.NewGuid();
-        var existingAuth = new WorkAuthorization { Id = authId, RowVersion = new byte[] { 1 } };
+        var request = new UpdateWorkAuthorizationRequest();
+        var command = new UpdateWorkAuthorizationCommand(authId, request);
+
+        _repositoryMock.Setup(r => r.GetByIdAsync(authId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((WorkAuthorization?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_StaleXmin_ThrowsConcurrencyException()
+    {
+        // Arrange
+        var authId = Guid.NewGuid();
+        var existingAuth = new WorkAuthorization { Id = authId, Xmin = 100 };
         var request = new UpdateWorkAuthorizationRequest
         {
-            RowVersion = new byte[] { 2 } // Different RowVersion
+            ExpirationDate = DateTime.UtcNow.AddDays(200),
+            Xmin = 50
         };
         var command = new UpdateWorkAuthorizationCommand(authId, request);
 
@@ -65,6 +79,33 @@ public class UpdateWorkAuthorizationCommandHandlerTests
             .ReturnsAsync(existingAuth);
 
         // Act & Assert
-        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => _handler.Handle(command, CancellationToken.None));
+        await Assert.ThrowsAsync<ConcurrencyException>(() => _handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_ZeroXminInEntity_AllowsUpdate()
+    {
+        // Arrange
+        var authId = Guid.NewGuid();
+        var existingAuth = new WorkAuthorization { Id = authId, Xmin = 0 };
+        var request = new UpdateWorkAuthorizationRequest
+        {
+            ExpirationDate = DateTime.UtcNow.AddDays(200),
+            Xmin = null
+        };
+        var command = new UpdateWorkAuthorizationCommand(authId, request);
+
+        _repositoryMock.Setup(r => r.GetByIdAsync(authId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingAuth);
+
+        _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<WorkAuthorization>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((WorkAuthorization w, CancellationToken c) => w);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(result);
+        _repositoryMock.Verify(r => r.UpdateAsync(It.IsAny<WorkAuthorization>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

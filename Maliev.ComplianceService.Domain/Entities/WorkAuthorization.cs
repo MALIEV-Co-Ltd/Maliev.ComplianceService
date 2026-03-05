@@ -1,5 +1,6 @@
 using Maliev.ComplianceService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Maliev.ComplianceService.Domain.Entities;
 
@@ -98,9 +99,10 @@ public class WorkAuthorization
     public DateTime? ModifiedDate { get; set; }
 
     /// <summary>
-    /// Optimistic concurrency token
+    /// PostgreSQL xmin for optimistic concurrency
     /// </summary>
-    public byte[]? RowVersion { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public uint Xmin { get; set; }
 
     /// <summary>
     /// Navigation property for compliance alerts related to this authorization

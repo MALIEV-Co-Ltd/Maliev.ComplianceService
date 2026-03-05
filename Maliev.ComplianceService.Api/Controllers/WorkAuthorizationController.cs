@@ -83,9 +83,16 @@ public class WorkAuthorizationController : ControllerBase
         Guid authId,
         [FromBody] UpdateWorkAuthorizationRequest request)
     {
-        var command = new UpdateWorkAuthorizationCommand(authId, request);
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        try
+        {
+            var command = new UpdateWorkAuthorizationCommand(authId, request);
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+        catch (ConcurrencyException)
+        {
+            return Conflict(new { error = "CONCURRENT_MODIFICATION", message = "The resource was modified by another request. Please refresh and try again." });
+        }
     }
 
     /// <summary>

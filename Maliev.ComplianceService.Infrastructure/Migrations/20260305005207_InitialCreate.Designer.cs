@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Maliev.ComplianceService.Infrastructure.Migrations
 {
     [DbContext(typeof(ComplianceDbContext))]
-    [Migration("20260304104457_InitialCreate")]
+    [Migration("20260305005207_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -164,16 +164,15 @@ namespace Maliev.ComplianceService.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("right_to_work_document_id");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea")
-                        .HasColumnName("row_version");
-
                     b.Property<int?>("SponsorshipStatus")
                         .HasColumnType("integer")
                         .HasColumnName("sponsorship_status");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

@@ -46,6 +46,7 @@ public record WorkAuthorizationResponse
     /// <summary> Last modification timestamp. </summary>
     public DateTime? ModifiedDate { get; init; }
 
-    /// <summary> Concurrency token. </summary>
-    public byte[] RowVersion { get; init; } = null!;
+    /// <summary> Concurrency token (PostgreSQL xmin). </summary>
+    public uint? Xmin { get; init; }
+
 }

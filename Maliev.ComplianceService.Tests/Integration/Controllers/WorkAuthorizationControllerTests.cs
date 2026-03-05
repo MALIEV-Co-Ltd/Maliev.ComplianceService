@@ -46,6 +46,7 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
         Assert.Equal(employeeId, result.EmployeeId);
         Assert.Equal(request.DocumentNumber, result.DocumentNumber);
         Assert.Equal(ComplianceStatus.Compliant, result.ComplianceStatus);
+        Assert.NotNull(result.Xmin);
     }
 
     [Fact]
@@ -88,11 +89,12 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
         };
         var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
         var auth = await recordResponse.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
+        Assert.NotNull(auth);
 
         var updateRequest = new UpdateWorkAuthorizationRequest
         {
             ExpirationDate = DateTime.UtcNow.AddDays(200),
-            RowVersion = auth!.RowVersion
+            Xmin = auth.Xmin
         };
 
         // Act
@@ -109,6 +111,38 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
         var updated = await response.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
         Assert.NotNull(updated);
         Assert.Equal(updateRequest.ExpirationDate, updated.ExpirationDate);
+        Assert.NotNull(updated.Xmin);
+    }
+
+    [Fact]
+    public async Task Put_WithStaleXmin_ReturnsConflict()
+    {
+        // Arrange
+        var employeeId = Guid.NewGuid();
+        var recordRequest = new RecordWorkAuthorizationRequest
+        {
+            AuthorizationType = AuthorizationType.WorkVisa,
+            DocumentNumber = "CONFLICT-001",
+            IssueDate = DateTime.UtcNow.AddDays(-30),
+            ExpirationDate = DateTime.UtcNow.AddDays(100),
+            RightToWorkDocumentId = Guid.NewGuid()
+        };
+        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
+        var auth = await recordResponse.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
+        Assert.NotNull(auth);
+
+        var staleXmin = auth.Xmin + 100;
+        var updateRequest = new UpdateWorkAuthorizationRequest
+        {
+            ExpirationDate = DateTime.UtcNow.AddDays(200),
+            Xmin = staleXmin
+        };
+
+        // Act
+        var response = await _client.PutAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/{auth.Id}", updateRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
     [Fact]
@@ -190,41 +224,12 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
     {
         // Arrange
         var authId = Guid.NewGuid();
-        var request = new UpdateWorkAuthorizationRequest
-        {
-            RowVersion = new byte[] { 1 }
-        };
+        var request = new UpdateWorkAuthorizationRequest();
 
         // Act
         var response = await _client.PutAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/{authId}", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task Put_WithInvalidRowVersion_Returns409()
-    {
-        // Arrange
-        var employeeId = Guid.NewGuid();
-        var recordRequest = new RecordWorkAuthorizationRequest
-        {
-            AuthorizationType = AuthorizationType.Citizen,
-            DocumentNumber = "ROW-VERSION-001",
-            IssueDate = DateTime.UtcNow.AddDays(-30)
-        };
-        var recordResponse = await _client.PostAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/employees/{employeeId}", recordRequest);
-        var auth = await recordResponse.Content.ReadFromJsonSnakeCaseAsync<WorkAuthorizationResponse>();
-
-        var updateRequest = new UpdateWorkAuthorizationRequest
-        {
-            RowVersion = new byte[] { 99, 99 } // Different version
-        };
-
-        // Act
-        var response = await _client.PutAsJsonSnakeCaseAsync($"/compliance/v1/work-authorizations/{auth!.Id}", updateRequest);
-
-        // Assert - returns conflict or internal error depending on implementation
-        Assert.True(response.StatusCode == HttpStatusCode.Conflict || response.StatusCode == HttpStatusCode.InternalServerError);
     }
 }

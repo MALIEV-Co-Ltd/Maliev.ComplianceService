@@ -3,9 +3,20 @@ using Maliev.ComplianceService.Application.Interfaces;
 using Maliev.ComplianceService.Application.Mappers;
 using Maliev.ComplianceService.Domain.Enums;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Maliev.ComplianceService.Application.Commands.UpdateWorkAuthorization;
+
+/// <summary>
+/// Exception thrown when concurrent modification is detected
+/// </summary>
+public class ConcurrencyException : Exception
+{
+    /// <summary>
+    /// Initializes a new instance of the ConcurrencyException class.
+    /// </summary>
+    /// <param name="message">The exception message.</param>
+    public ConcurrencyException(string message) : base(message) { }
+}
 
 /// <summary>
 /// Handles the UpdateWorkAuthorizationCommand.
@@ -37,10 +48,9 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
             throw new KeyNotFoundException("AUTHORIZATION_NOT_FOUND");
         }
 
-        // Optimistic locking check
-        if (!auth.RowVersion.SequenceEqual(command.Request.RowVersion))
+        if (command.Request.Xmin.HasValue && auth.Xmin != 0 && command.Request.Xmin != auth.Xmin)
         {
-            throw new DbUpdateConcurrencyException("CONCURRENT_MODIFICATION");
+            throw new ConcurrencyException("CONCURRENT_MODIFICATION");
         }
 
         // Update fields

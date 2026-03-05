@@ -1,5 +1,4 @@
 using Maliev.ComplianceService.Domain.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace Maliev.ComplianceService.Application.DTOs;
 
@@ -17,7 +16,6 @@ public record UpdateWorkAuthorizationRequest
     /// <summary> Updated notes. </summary>
     public string? Notes { get; init; }
 
-    /// <summary> Current row version for optimistic locking. </summary>
-    [Required]
-    public byte[] RowVersion { get; init; } = null!;
+    /// <summary> Concurrency token (PostgreSQL xmin). </summary>
+    public uint? Xmin { get; init; }
 }

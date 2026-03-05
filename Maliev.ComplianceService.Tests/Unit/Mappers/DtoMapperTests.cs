@@ -23,8 +23,7 @@ public class DtoMapperTests
             SponsorshipStatus = SponsorshipStatus.Sponsored,
             ComplianceStatus = ComplianceStatus.Compliant,
             CreatedDate = DateTime.UtcNow.AddDays(-30),
-            ModifiedDate = DateTime.UtcNow,
-            RowVersion = new byte[] { 1 }
+            ModifiedDate = DateTime.UtcNow
         };
 
         var result = DtoMapper.ToDto(entity, "Test Employee");
@@ -86,8 +85,7 @@ public class DtoMapperTests
             ExpirationDate = DateTime.UtcNow.AddDays(30),
             ComplianceStatus = ComplianceStatus.ExpiringSoon,
             CreatedDate = DateTime.UtcNow.AddDays(-30),
-            ModifiedDate = DateTime.UtcNow,
-            RowVersion = new byte[] { 1 }
+            ModifiedDate = DateTime.UtcNow
         };
 
         var result = DtoMapper.ToExpiringDto(entity, "Expiring Employee");

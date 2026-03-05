@@ -33,7 +33,7 @@ public static class DtoMapper
             ComplianceStatus = entity.ComplianceStatus,
             CreatedDate = entity.CreatedDate,
             ModifiedDate = entity.ModifiedDate,
-            RowVersion = entity.RowVersion ?? Array.Empty<byte>()
+            Xmin = entity.Xmin
         };
     }
 
@@ -62,7 +62,7 @@ public static class DtoMapper
             ComplianceStatus = entity.ComplianceStatus,
             CreatedDate = entity.CreatedDate,
             ModifiedDate = entity.ModifiedDate,
-            RowVersion = entity.RowVersion ?? Array.Empty<byte>()
+            Xmin = entity.Xmin
         };
     }
 
