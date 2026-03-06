@@ -7,6 +7,7 @@ using Maliev.ComplianceService.Application.Queries.GetExpiringAuthorizations;
 using Maliev.ComplianceService.Application.Queries.GetWorkAuthorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Maliev.ComplianceService.Api.Controllers;
 
@@ -89,7 +90,7 @@ public class WorkAuthorizationController : ControllerBase
             var result = await _mediator.Send(command);
             return Ok(result);
         }
-        catch (ConcurrencyException)
+        catch (DbUpdateConcurrencyException)
         {
             return Conflict(new { error = "CONCURRENT_MODIFICATION", message = "The resource was modified by another request. Please refresh and try again." });
         }

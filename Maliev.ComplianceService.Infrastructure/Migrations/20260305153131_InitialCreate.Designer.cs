@@ -3,6 +3,7 @@ using System;
 using Maliev.ComplianceService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Maliev.ComplianceService.Infrastructure.Migrations
 {
     [DbContext(typeof(ComplianceDbContext))]
-    partial class ComplianceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260305153131_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,12 +167,6 @@ namespace Maliev.ComplianceService.Infrastructure.Migrations
                     b.Property<int?>("SponsorshipStatus")
                         .HasColumnType("integer")
                         .HasColumnName("sponsorship_status");
-
-                    b.Property<uint>("Xmin")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

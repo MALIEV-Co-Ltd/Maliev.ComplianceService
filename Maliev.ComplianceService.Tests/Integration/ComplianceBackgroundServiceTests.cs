@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Maliev.ComplianceService.Tests.Integration;
 
+[Collection("IntegrationTests")]
 public class ComplianceBackgroundServiceTests : IClassFixture<ComplianceServiceTestFixture>
 {
     private readonly ComplianceServiceTestFixture _fixture;

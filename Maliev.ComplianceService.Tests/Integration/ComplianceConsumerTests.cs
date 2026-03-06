@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Maliev.ComplianceService.Tests.Integration;
 
+[Collection("IntegrationTests")]
 public class ComplianceConsumerTests : IClassFixture<ComplianceServiceTestFixture>
 {
     private readonly ComplianceServiceTestFixture _fixture;

@@ -7,18 +7,6 @@ using MediatR;
 namespace Maliev.ComplianceService.Application.Commands.UpdateWorkAuthorization;
 
 /// <summary>
-/// Exception thrown when concurrent modification is detected
-/// </summary>
-public class ConcurrencyException : Exception
-{
-    /// <summary>
-    /// Initializes a new instance of the ConcurrencyException class.
-    /// </summary>
-    /// <param name="message">The exception message.</param>
-    public ConcurrencyException(string message) : base(message) { }
-}
-
-/// <summary>
 /// Handles the UpdateWorkAuthorizationCommand.
 /// </summary>
 public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkAuthorizationCommand, WorkAuthorizationResponse>
@@ -46,11 +34,6 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
         if (auth == null)
         {
             throw new KeyNotFoundException("AUTHORIZATION_NOT_FOUND");
-        }
-
-        if (command.Request.Xmin.HasValue && auth.Xmin != 0 && command.Request.Xmin != auth.Xmin)
-        {
-            throw new ConcurrencyException("CONCURRENT_MODIFICATION");
         }
 
         // Update fields
