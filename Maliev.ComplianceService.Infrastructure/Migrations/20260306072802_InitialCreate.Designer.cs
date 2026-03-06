@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Maliev.ComplianceService.Infrastructure.Migrations
 {
     [DbContext(typeof(ComplianceDbContext))]
-    [Migration("20260306071957_AddXminConcurrencyToken")]
-    partial class AddXminConcurrencyToken
+    [Migration("20260306072802_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
