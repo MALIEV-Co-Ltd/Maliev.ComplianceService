@@ -12,7 +12,7 @@ namespace Maliev.ComplianceService.Api.Controllers;
 /// Controller for managing compliance alerts.
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("compliance/v{version:apiVersion}/compliance-alerts")]
 public class AlertsController : ControllerBase
 {

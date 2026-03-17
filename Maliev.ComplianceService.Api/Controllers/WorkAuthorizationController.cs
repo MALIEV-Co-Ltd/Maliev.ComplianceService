@@ -15,7 +15,7 @@ namespace Maliev.ComplianceService.Api.Controllers;
 /// Controller for managing employee work authorizations.
 /// </summary>
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersion("1")]
 [Route("compliance/v{version:apiVersion}/work-authorizations")]
 public class WorkAuthorizationController : ControllerBase
 {
