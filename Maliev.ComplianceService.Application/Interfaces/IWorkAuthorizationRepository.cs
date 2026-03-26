@@ -14,6 +14,11 @@ public interface IWorkAuthorizationRepository
     Task<WorkAuthorization?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets the xmin (concurrency token) for a work authorization
+    /// </summary>
+    Task<uint?> GetXminAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets all work authorizations for a specific employee
     /// </summary>
     Task<IEnumerable<WorkAuthorization>> GetByEmployeeIdAsync(Guid employeeId, CancellationToken cancellationToken = default);

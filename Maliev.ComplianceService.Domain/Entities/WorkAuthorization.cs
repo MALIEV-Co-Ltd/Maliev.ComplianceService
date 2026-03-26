@@ -99,12 +99,6 @@ public class WorkAuthorization
     public DateTime? ModifiedDate { get; set; }
 
     /// <summary>
-    /// PostgreSQL xmin for optimistic concurrency
-    /// </summary>
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public uint Xmin { get; set; }
-
-    /// <summary>
     /// Navigation property for compliance alerts related to this authorization
     /// </summary>
     public ICollection<ComplianceAlert> ComplianceAlerts { get; set; } = new List<ComplianceAlert>();

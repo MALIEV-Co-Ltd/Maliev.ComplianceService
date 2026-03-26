@@ -89,6 +89,8 @@ public class RecordWorkAuthorizationCommandHandler : IRequestHandler<RecordWorkA
             ), cancellationToken);
         }
 
-        return DtoMapper.ToDto(created);
+        var xmin = await _repository.GetXminAsync(created.Id, cancellationToken);
+
+        return DtoMapper.ToDto(created, "(name unavailable)", xmin);
     }
 }

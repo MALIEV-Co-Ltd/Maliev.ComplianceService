@@ -32,6 +32,19 @@ public class WorkAuthorizationRepository : IWorkAuthorizationRepository
     }
 
     /// <inheritdoc/>
+    public async Task<uint?> GetXminAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _context.WorkAuthorizations
+            .FirstOrDefaultAsync(w => w.Id == id, cancellationToken);
+        if (entity == null)
+        {
+            return null;
+        }
+
+        return _context.Entry(entity).Property<uint>("xmin").CurrentValue;
+    }
+
+    /// <inheritdoc/>
     public async Task<IEnumerable<WorkAuthorization>> GetByEmployeeIdAsync(Guid employeeId, CancellationToken cancellationToken = default)
     {
         return await _context.WorkAuthorizations

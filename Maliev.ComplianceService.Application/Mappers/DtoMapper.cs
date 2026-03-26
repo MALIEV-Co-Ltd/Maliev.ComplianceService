@@ -13,8 +13,9 @@ public static class DtoMapper
     /// </summary>
     /// <param name="entity">The work authorization entity.</param>
     /// <param name="employeeName">The name of the employee.</param>
+    /// <param name="xmin">The PostgreSQL xmin concurrency token.</param>
     /// <returns>A mapped work authorization response.</returns>
-    public static WorkAuthorizationResponse ToDto(WorkAuthorization entity, string employeeName = "(name unavailable)")
+    public static WorkAuthorizationResponse ToDto(WorkAuthorization entity, string employeeName = "(name unavailable)", uint? xmin = null)
     {
         return new WorkAuthorizationResponse
         {
@@ -33,7 +34,7 @@ public static class DtoMapper
             ComplianceStatus = entity.ComplianceStatus,
             CreatedDate = entity.CreatedDate,
             ModifiedDate = entity.ModifiedDate,
-            Xmin = entity.Xmin
+            Xmin = xmin
         };
     }
 
@@ -42,8 +43,9 @@ public static class DtoMapper
     /// </summary>
     /// <param name="entity">The work authorization entity.</param>
     /// <param name="employeeName">The name of the employee.</param>
+    /// <param name="xmin">The PostgreSQL xmin concurrency token.</param>
     /// <returns>A mapped expiring authorization response.</returns>
-    public static ExpiringAuthorizationResponse ToExpiringDto(WorkAuthorization entity, string employeeName = "(name unavailable)")
+    public static ExpiringAuthorizationResponse ToExpiringDto(WorkAuthorization entity, string employeeName = "(name unavailable)", uint? xmin = null)
     {
         return new ExpiringAuthorizationResponse
         {
@@ -62,7 +64,7 @@ public static class DtoMapper
             ComplianceStatus = entity.ComplianceStatus,
             CreatedDate = entity.CreatedDate,
             ModifiedDate = entity.ModifiedDate,
-            Xmin = entity.Xmin
+            Xmin = xmin
         };
     }
 

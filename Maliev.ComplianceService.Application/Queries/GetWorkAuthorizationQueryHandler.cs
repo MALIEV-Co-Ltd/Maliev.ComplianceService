@@ -39,6 +39,7 @@ public class GetWorkAuthorizationQueryHandler : IRequestHandler<GetWorkAuthoriza
         }
 
         var name = await _employeeService.GetEmployeeNameAsync(auth.EmployeeId, cancellationToken);
-        return DtoMapper.ToDto(auth, name);
+        var xmin = await _repository.GetXminAsync(query.AuthId, cancellationToken);
+        return DtoMapper.ToDto(auth, name, xmin);
     }
 }

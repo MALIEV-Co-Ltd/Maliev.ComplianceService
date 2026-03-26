@@ -38,7 +38,8 @@ public class GetExpiringAuthorizationsQueryHandler : IRequestHandler<GetExpiring
         foreach (var auth in authorizations)
         {
             var name = await _employeeService.GetEmployeeNameAsync(auth.EmployeeId, cancellationToken);
-            var response = DtoMapper.ToExpiringDto(auth, name);
+            var xmin = await _repository.GetXminAsync(auth.Id, cancellationToken);
+            var response = DtoMapper.ToExpiringDto(auth, name, xmin);
             results.Add(response);
         }
 

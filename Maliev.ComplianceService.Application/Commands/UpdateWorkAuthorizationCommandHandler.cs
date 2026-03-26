@@ -56,7 +56,8 @@ public class UpdateWorkAuthorizationCommandHandler : IRequestHandler<UpdateWorkA
         auth.ModifiedDate = DateTime.UtcNow;
 
         var updated = await _repository.UpdateAsync(auth, cancellationToken);
+        var xmin = await _repository.GetXminAsync(command.AuthId, cancellationToken);
 
-        return DtoMapper.ToDto(updated);
+        return DtoMapper.ToDto(updated, "(name unavailable)", xmin);
     }
 }
