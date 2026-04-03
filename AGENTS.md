@@ -5,24 +5,24 @@ This repository contains the `Maliev.ComplianceService`, a .NET 10 Web API built
 ## 1. Build & Verification
 
 ### Build
-- **Build Solution:** `dotnet build`
+- **Build Solution:** `dotnet build Maliev.ComplianceService.slnx`
 - **Build Specific Project:** `dotnet build Maliev.ComplianceService.Api`
 
 ### Tests
 The solution uses **xUnit** for testing.
 
-- **Run All Tests:** `dotnet test`
-- **Run Specific Test Project:** `dotnet test Maliev.ComplianceService.Tests`
+- **Run All Tests:** `dotnet test Maliev.ComplianceService.slnx --verbosity normal`
+- **Run with Code Coverage:** `dotnet test Maliev.ComplianceService.slnx --collect:"XPlat Code Coverage"`
 - **Run Single Test:**
   ```bash
-  dotnet test --filter "FullyQualifiedName=Namespace.ClassName.MethodName"
+  dotnet test --filter "FullyQualifiedName~Namespace.ClassName.MethodName"
   ```
   *Example:*
-  `dotnet test --filter "FullyQualifiedName=Maliev.ComplianceService.Tests.Unit.Commands.MyCommandTests.Handle_ValidRequest_Success"`
+  `dotnet test --filter "FullyQualifiedName~Maliev.ComplianceService.Tests.Unit.Commands.MyCommandTests.Handle_ValidRequest_Success"`
 
 ### Linting & Formatting
-- **Format Code:** `dotnet format`
-- **Verify Formatting:** `dotnet format --verify-no-changes`
+- **Format Code:** `dotnet format Maliev.ComplianceService.slnx`
+- **Verify Formatting:** `dotnet format Maliev.ComplianceService.slnx --verify-no-changes`
 
 ## 2. Code Style & Conventions
 
@@ -31,30 +31,36 @@ The solution uses **xUnit** for testing.
 - **CQRS:** Use **MediatR** for Commands and Queries.
   - **Commands:** Mutate state. Return `Unit` or created resource DTO.
   - **Queries:** Read-only. Return DTOs.
-- **Validation:** Use Data Annotations on Entities. Manual validation in Application layer.
+- **Validation:** Use `System.ComponentModel.DataAnnotations` on DTOs. FluentValidation is banned.
 
 ### Syntax & Features
 - **Target Framework:** .NET 10
-- **Namespaces:** Use **file-scoped namespaces** (`namespace My.Namespace;`).
-- **Nullability:** Enabled. Use `string?` for nullable strings.
+- **Namespaces:** File-scoped (`namespace Maliev.ComplianceService.Domain.Entities;`)
+- **Nullability:** Enabled (`<Nullable>enable</Nullable>`). Use `?` explicitly
 - **Records:** Use `public record` for DTOs, Commands, and Queries.
 - **Entities:** Standard `class` with getters/setters. Use `[Required]`, `[MaxLength]` annotations.
 
-### Naming
-- **Classes/Methods:** `PascalCase`
-- **Variables/Params:** `camelCase`
-- **Private Fields:** `_camelCase` (underscore prefix)
-- **Interfaces:** `IPascalCase`
-- **Async Methods:** Suffix with `Async` generally preferred for I/O operations (check surrounding code).
+### C# Naming & Formatting
+- **Classes/Methods/Properties:** `PascalCase`
+- **Private fields:** `_camelCase` (underscore prefix)
+- **Parameters/locals:** `camelCase`
+- **Async methods:** Suffix with `Async` (e.g., `AuthenticateAsync`)
+- **Interfaces:** Prefix with `I` (e.g., `IAuthenticationService`)
+- **Permissions:** GCP-style `{domain}.{plural-resource}.{action}` as `public const string` in a `Permissions` static class
+  - Valid: `compliance.audits.create`, `compliance.rules.update`
+  - Invalid: `compliance.audit.create` (singular), `compliance.create` (missing resource)
+- **XML docs:** Required on ALL public methods and properties
+- **Imports:** System first, then third-party, then local. Alphabetize within groups. Remove unused `using`
+- **Braces:** Allman style (new line) for methods and control structures. Expression-bodied for properties/accessors
+- **Indentation:** 4 spaces, LF line endings, UTF-8, trim trailing whitespace
 
-### Imports (Usings)
-- Place `using` directives at the top of the file.
-- Remove unused usings.
-- `ImplicitUsings` are enabled, so standard system namespaces may not be needed.
-
-### Error Handling
-- Use structured exception handling.
-- meaningful error messages in exceptions.
+### C# Patterns
+- **DI:** Constructor injection with `private readonly` fields
+- **Controllers:** `[ApiController]`, `[ApiVersion("1")]`, `[Route("compliance/v{version:apiVersion}")]`
+- **Logging:** `ILogger<T>` with structured placeholders (never interpolate): `_logger.LogInformation("Processing {FileId}", fileId)`
+- **Error handling:** Global exception middleware. Return `ProblemDetails` / `ErrorResponse` DTOs. Never expose stack traces
+- **Manual mapping:** Static extension methods (`ToDto()`, `ToEntity()`). AutoMapper is banned
+- **Validation:** `System.ComponentModel.DataAnnotations` on DTOs. FluentValidation is banned
 
 ## 3. Agent Operational Rules
 
@@ -74,12 +80,15 @@ This service's tests cover **Tier 1 (Unit)** and **Tier 2 (Service Integration)*
 
 **Tier 3 (System Integration)** — cross-service workflows and event chains — is tested in `Maliev.Aspire.Tests/`.
 
-#### Key Rules
-- Use `BaseIntegrationTestFactory<TProgram, TDbContext>` for integration tests (real Testcontainers, never InMemoryDatabase)
-- Every MassTransit consumer MUST have a consumer test using `services.AddMassTransitTestHarness()`
-- Test naming: `MethodName_StateUnderTest_ExpectedBehavior`
-- Minimum 80% code coverage
+#### Testing Rules
+- **Framework**: xUnit with standard `Assert` (`Assert.Equal`, `Assert.NotNull`, etc.)
+- **Naming**: `MethodName_StateUnderTest_ExpectedBehavior` or `HTTP_METHOD_Path_Scenario_ExpectedStatus`
+- **Coverage**: Minimum 80% per service
+- **Integration tests**: `BaseIntegrationTestFactory<TProgram, TDbContext>` with Testcontainers (PostgreSQL, Redis, RabbitMQ). Never InMemoryDatabase
+- **System tests** (Tier 3): `AspireTestFixture` with `[Collection("AspireDomainTests")]` — shared AppHost, never one per class
+- **Eventual consistency**: Use `TestHelpers.WaitForAsync`. Never `Task.Delay`
 - Use `[Fact]` for single cases, `[Theory]` for parameterized tests
+- Every MassTransit consumer MUST have a consumer test using `services.AddMassTransitTestHarness()`
 
 > Full ecosystem test strategy: `Maliev.Aspire.Tests/TEST_PLAN.md`
 
@@ -94,6 +103,28 @@ This service's tests cover **Tier 1 (Unit)** and **Tier 2 (Service Integration)*
 - **Documentation:**
   - Maintain XML comments (`/// <summary>`) on public members, especially in Domain and Application layers.
 
+## Banned Libraries (Build Will Fail)
+
+| Banned | Use Instead |
+|--------|-------------|
+| AutoMapper | Manual mapping extensions |
+| FluentValidation | DataAnnotations or manual validation |
+| FluentAssertions | Standard xUnit `Assert.*` |
+| Swashbuckle/Swagger | Scalar (at `/compliance/scalar`) |
+| InMemoryDatabase (EF Core) | Testcontainers with real PostgreSQL |
+
+## Mandatory Rules
+
+- **`TreatWarningsAsErrors = true`**: Zero warnings allowed. No suppression
+- **`[RequirePermission("compliance.resources.action")]`**: On all endpoints, not plain `[Authorize]`
+- **API versioning**: All routes versioned (`v1/`)
+- **Service prefix**: Routes prefixed with `/compliance`
+- **Scalar docs**: Configured at `/compliance/scalar`
+- **Secrets**: Never hardcoded. Use GCP Secret Manager or environment variables
+- **Async/await**: All the way down. Pass `CancellationToken`
+- **EF Core Design package**: Only in Infrastructure project, never in Api
+- **PostgreSQL xmin**: Shadow property only — `entity.Property<uint>("xmin").HasColumnType("xid").IsRowVersion()`. Never add entity property
+- **Temporary files**: Generate in `/temp` folder, clean up afterwards
 
 ## Git & Version Control — Mandatory Rules
 
@@ -116,7 +147,7 @@ This service's tests cover **Tier 1 (Unit)** and **Tier 2 (Service Integration)*
 - ✅ It belongs ONLY in the Infrastructure (or Data) project where migrations live
 - Migration commands must target Infrastructure as both project and startup-project (since EF Core Design package is in Infrastructure):
   ```
-  dotnet ef migrations add <Name> --project Maliev.<Domain>Service.Infrastructure --startup-project Maliev.<Domain>Service.Infrastructure
+  dotnet ef migrations add <Name> --project Maliev.ComplianceService.Infrastructure --startup-project Maliev.ComplianceService.Infrastructure
   ```
 
 ### PostgreSQL xmin Concurrency — Mandatory Pattern
