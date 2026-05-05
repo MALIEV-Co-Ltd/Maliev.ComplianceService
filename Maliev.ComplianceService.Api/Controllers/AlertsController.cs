@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using Maliev.Aspire.ServiceDefaults.Authorization;
+using Maliev.ComplianceService.Application.Authorization;
 using Maliev.ComplianceService.Application.Commands.ResolveAlert;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Queries.GetAlerts;
@@ -39,6 +41,7 @@ public class AlertsController : ControllerBase
     /// <param name="resolvedBy">Filter by the user who resolved the alert.</param>
     /// <returns>A collection of compliance alerts.</returns>
     [HttpGet]
+    [RequirePermission(CompliancePermissions.RecordRead)]
     public async Task<ActionResult<IEnumerable<ComplianceAlertResponse>>> GetAlerts(
         [FromQuery] bool? isResolved = null,
         [FromQuery] AlertSeverity? severity = null,
@@ -60,6 +63,7 @@ public class AlertsController : ControllerBase
     /// <param name="request">The resolution details.</param>
     /// <returns>No content on success.</returns>
     [HttpPut("{alertId}/resolve")]
+    [RequirePermission(CompliancePermissions.RecordUpdate)]
     public async Task<IActionResult> ResolveAlert(Guid alertId, [FromBody] ResolveAlertRequest request)
     {
         var command = new ResolveAlertCommand(alertId, request);

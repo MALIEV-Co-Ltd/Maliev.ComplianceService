@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using Maliev.Aspire.ServiceDefaults.Authorization;
+using Maliev.ComplianceService.Application.Authorization;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Application.Queries.GetComplianceReport;
 using MediatR;
@@ -31,6 +33,7 @@ public class ReportsController : ControllerBase
     /// <param name="departmentId">Optional filter by department unique identifier.</param>
     /// <returns>A compliance summary report.</returns>
     [HttpGet("compliance")]
+    [RequirePermission(CompliancePermissions.ReportGenerate)]
     public async Task<ActionResult<ComplianceReportResponse>> GetComplianceReport([FromQuery] Guid? departmentId = null)
     {
         var query = new GetComplianceReportQuery(departmentId);

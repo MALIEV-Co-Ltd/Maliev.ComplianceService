@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using Maliev.Aspire.ServiceDefaults.Authorization;
+using Maliev.ComplianceService.Application.Authorization;
 using Maliev.ComplianceService.Application.Commands.RecordWorkAuthorization;
 using Maliev.ComplianceService.Application.Commands.UpdateWorkAuthorization;
 using Maliev.ComplianceService.Application.DTOs;
@@ -37,6 +39,7 @@ public class WorkAuthorizationController : ControllerBase
     /// <param name="request">The work authorization details.</param>
     /// <returns>The created work authorization details.</returns>
     [HttpPost("employees/{employeeId}")]
+    [RequirePermission(CompliancePermissions.RecordCreate)]
     public async Task<ActionResult<WorkAuthorizationResponse>> RecordWorkAuthorization(
         Guid employeeId,
         [FromBody] RecordWorkAuthorizationRequest request)
@@ -53,6 +56,7 @@ public class WorkAuthorizationController : ControllerBase
     /// <param name="employeeId">The employee unique identifier.</param>
     /// <returns>A collection of work authorizations.</returns>
     [HttpGet("employees/{employeeId}")]
+    [RequirePermission(CompliancePermissions.RecordRead)]
     public async Task<ActionResult<IEnumerable<WorkAuthorizationResponse>>> GetEmployeeWorkAuthorizations(Guid employeeId)
     {
         var query = new GetEmployeeWorkAuthorizationsQuery(employeeId);
@@ -66,6 +70,7 @@ public class WorkAuthorizationController : ControllerBase
     /// <param name="authId">The work authorization unique identifier.</param>
     /// <returns>The work authorization details.</returns>
     [HttpGet("{authId}")]
+    [RequirePermission(CompliancePermissions.RecordRead)]
     public async Task<ActionResult<WorkAuthorizationResponse>> GetWorkAuthorization(Guid authId)
     {
         var query = new GetWorkAuthorizationQuery(authId);
@@ -80,6 +85,7 @@ public class WorkAuthorizationController : ControllerBase
     /// <param name="request">The updated details.</param>
     /// <returns>The updated work authorization details.</returns>
     [HttpPut("{authId}")]
+    [RequirePermission(CompliancePermissions.RecordUpdate)]
     public async Task<ActionResult<WorkAuthorizationResponse>> UpdateWorkAuthorization(
         Guid authId,
         [FromBody] UpdateWorkAuthorizationRequest request)
@@ -102,6 +108,7 @@ public class WorkAuthorizationController : ControllerBase
     /// <param name="daysUntilExpiration">The threshold in days for expiration (default 90).</param>
     /// <returns>A collection of expiring work authorizations.</returns>
     [HttpGet("expiring")]
+    [RequirePermission(CompliancePermissions.RecordRead)]
     public async Task<ActionResult<IEnumerable<ExpiringAuthorizationResponse>>> GetExpiringAuthorizations(
         [FromQuery] int daysUntilExpiration = 90)
     {
