@@ -113,8 +113,23 @@ public class WorkAuthorizationRepository : IWorkAuthorizationRepository
     /// <inheritdoc/>
     public async Task<WorkAuthorization> UpdateAsync(WorkAuthorization authorization, CancellationToken cancellationToken = default)
     {
+        var entry = _context.Entry(authorization);
+        if (entry.State == EntityState.Detached)
+        {
+            var tracked = await _context.WorkAuthorizations
+                .FirstOrDefaultAsync(w => w.Id == authorization.Id, cancellationToken);
+            if (tracked == null)
+            {
+                throw new KeyNotFoundException($"Work authorization {authorization.Id} was not found.");
+            }
+
+            _context.Entry(tracked).CurrentValues.SetValues(authorization);
+            tracked.ModifiedDate = DateTime.UtcNow;
+            await _context.SaveChangesAsync(cancellationToken);
+            return tracked;
+        }
+
         authorization.ModifiedDate = DateTime.UtcNow;
-        _context.WorkAuthorizations.Update(authorization);
         await _context.SaveChangesAsync(cancellationToken);
         return authorization;
     }

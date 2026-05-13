@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Maliev.ComplianceService.Application.Authorization;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Tests.Fixtures;
 using Xunit;
@@ -15,7 +16,10 @@ public class ReportsControllerTests : IClassFixture<ComplianceServiceTestFixture
     public ReportsControllerTests(ComplianceServiceTestFixture fixture)
     {
         _fixture = fixture;
-        _client = fixture.CreateClient();
+        _client = fixture.CreateAuthenticatedClient(permissions: new[]
+        {
+            CompliancePermissions.ReportGenerate
+        });
     }
 
     [Fact]

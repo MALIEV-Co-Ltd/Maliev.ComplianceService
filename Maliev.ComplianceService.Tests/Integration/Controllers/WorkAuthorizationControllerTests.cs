@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Maliev.ComplianceService.Application.Authorization;
 using Maliev.ComplianceService.Application.DTOs;
 using Maliev.ComplianceService.Domain.Enums;
 using Maliev.ComplianceService.Tests.Fixtures;
@@ -16,7 +17,12 @@ public class WorkAuthorizationControllerTests : IClassFixture<ComplianceServiceT
     public WorkAuthorizationControllerTests(ComplianceServiceTestFixture fixture)
     {
         _fixture = fixture;
-        _client = fixture.CreateClient();
+        _client = fixture.CreateAuthenticatedClient(permissions: new[]
+        {
+            CompliancePermissions.RecordCreate,
+            CompliancePermissions.RecordRead,
+            CompliancePermissions.RecordUpdate
+        });
     }
 
     [Fact]
