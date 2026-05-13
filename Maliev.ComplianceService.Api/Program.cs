@@ -83,10 +83,8 @@ try
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
     // --- Database Migrations ---
-    if (!app.Environment.IsEnvironment("Testing"))
-    {
-        await app.MigrateDatabaseAsync<ComplianceDbContext>();
-    }
+    // AppHost system tests also run with Testing, so the service must own schema creation.
+    await app.MigrateDatabaseAsync<ComplianceDbContext>();
 
     // --- Middleware Pipeline ---
     app.UseStandardMiddleware();
